@@ -1,0 +1,21 @@
+{
+  "name": "the-moon-smart-contract",
+  "version": "1.0.0",
+  "description": "cadence smart contract and all its tests for the moon nft platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Anthony Obeta",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.15.8",
+    "@babel/plugin-transform-modules-commonjs": "^7.15.4",
+    "@babel/preset-env": "^7.15.8",
+    "@onflow/types": "^0.0.5",
+    "babel-jest": "^27.3.1",
+    "flow-js-testing": "^0.1.14",
+    "jest": "^27.3.1",
+    "regenerator-runtime": "^0.13.9"
+  }
+}
