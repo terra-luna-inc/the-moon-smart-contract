@@ -1,4 +1,4 @@
-import { init, emulator, deployContractByName, getAccountAddress, mintFlow, getContractAddress } from "flow-js-testing";
+import { getAccountAddress, mintFlow } from "flow-js-testing";
 
 export const initializePlatformAccount = async (platformAccountName) => {
     platformAccountName = platformAccountName || "PlatformAccount";
@@ -9,6 +9,6 @@ export const initializePlatformAccount = async (platformAccountName) => {
     return platformAccount;
 }
 
-export const stopEmulator = async () => {
-    await emulator.stop();
+export const getTransactionEventName = (eventType) => {
+    return eventType.split('.').pop();
 }

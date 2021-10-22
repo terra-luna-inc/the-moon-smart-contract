@@ -23,10 +23,6 @@ const deployNftContract = async (platformAccount) => {
     });
 }
 
-export const getTransactionEventName = (eventType) => {
-    return eventType.split('.').pop();
-}
-
 describe('NftMinter', () => {
     let platformAccount;
 
