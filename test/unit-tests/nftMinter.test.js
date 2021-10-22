@@ -11,7 +11,7 @@ import {
     sendTransaction,
     shallRevert,
 } from "flow-js-testing";
-import { initializePlatformAccount } from '../testHelpers';
+import { getTransactionEventName, initializePlatformAccount } from '../testHelpers';
 
 const platformAccountName = "PlatformAccount";
 const TheMoonNFTContract = "TheMoonNFTContract";
@@ -126,7 +126,7 @@ describe('NftMinter', () => {
                 sendTransaction({ code, signers })
             );
 
-            const relevantEvents = txResult.events.filter(event => event.type.includes("MoonNftMinted"));
+            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "MoonNftMinted");
 
             expect(relevantEvents.length).toBe(1);
         });
@@ -233,7 +233,7 @@ describe('NftMinter', () => {
     });
 
     describe('bulkMintNfts() function', () => {
-        it('Successfully bulk mints a collection of nfts when valid input data is supplied', async () => {
+        fit('Successfully bulk mints a collection of nfts when valid input data is supplied', async () => {
             const code = `
                 import ${TheMoonNFTContract} from ${platformAccount}
 
@@ -280,7 +280,7 @@ describe('NftMinter', () => {
                 sendTransaction({ code, signers })
             );
 
-            const relevantEvents = txResult.events.filter(event => event.type.includes("MoonNftMinted"));
+            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "MoonNftMinted");
 
             expect(relevantEvents.length).toBe(2);
         });
@@ -362,7 +362,7 @@ describe('NftMinter', () => {
     });
 
     describe('createNftPack() function', () => {
-        it('Successfully creates a MoonNftPack with valid inputs supplied', async () => {
+        fit('Successfully creates a MoonNftPack with valid inputs supplied', async () => {
             const code = `
                 import ${TheMoonNFTContract} from ${platformAccount}
 
@@ -421,7 +421,7 @@ describe('NftMinter', () => {
                 sendTransaction({ code, signers })
             );
 
-            const relevantEvents = txResult.events.filter(event => event.type.includes("MoonNftPackCreated"));
+            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "MoonNftPackCreated");
 
             expect(relevantEvents.length).toBe(1);
         });
@@ -517,7 +517,7 @@ describe('NftMinter', () => {
     });
 
     describe('createNftPackRelease() function', () => {
-        it('Successfully creates a MoonNftRelease when all valid arguments are passed in', async () => {
+        fit('Successfully creates a MoonNftRelease when all valid arguments are passed in', async () => {
             const code = `
                 import ${TheMoonNFTContract} from ${platformAccount}
 
@@ -580,7 +580,7 @@ describe('NftMinter', () => {
                 sendTransaction({ code, signers })
             );
 
-            const relevantEvents = txResult.events.filter(event => event.type.includes("MoonNftPackReleaseCreated"));
+            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "MoonNftPackReleaseCreated");
 
             expect(relevantEvents.length).toBe(1);
         });
