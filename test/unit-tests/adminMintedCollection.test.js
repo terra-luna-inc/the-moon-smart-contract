@@ -27,7 +27,7 @@ const initialize = async () => {
     await init(basePath, {port});
     await emulator.start(port);
 
-    platformAccount = await initializePlatformAccount();
+    platformAccount = await initializePlatformAccount(platformAccountName);
     await deployNftContract(platformAccount, TheMoonNFTContract);
 }
 
