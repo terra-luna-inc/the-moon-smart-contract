@@ -2,8 +2,10 @@ import 'regenerator-runtime/runtime';
 import path from "path";
 import { init, emulator, deployContractByName, getAccountAddress, mintFlow, getContractAddress } from "flow-js-testing";
 
+const platformAccountName = "PlatformAccount";
+
 describe("Deployment", () => {
-    let PlatformAccount;
+    let platformAccount;
 
     beforeEach(async () => {
       const basePath = path.resolve(__dirname, "../cadence");
@@ -12,11 +14,10 @@ describe("Deployment", () => {
       await init(basePath, {port});
       await emulator.start(port);
 
-      // We will deploy our contract to the address that corresponds to "Alice" alias
-      PlatformAccount = await getAccountAddress("Alice");
-      await getAccountAddress("Alice");
+      platformAccount = await getAccountAddress(platformAccountName);
+      await getAccountAddress(platformAccountName);
 
-      await mintFlow(PlatformAccount, "1.0");
+      await mintFlow(platformAccount, "1.0");
 
     });
 
@@ -24,10 +25,10 @@ describe("Deployment", () => {
         await emulator.stop();
     })
 
-    test('Able to successfully deploy with name TheMoonNFTContract', async () => {
+    it('Able to successfully deploy with name TheMoonNFTContract', async () => {
 
         const name = "TheMoonNFTContract";
-        const to = PlatformAccount;
+        const to = platformAccount;
 
         const result = await deployContractByName({ to, name });
 
@@ -36,6 +37,6 @@ describe("Deployment", () => {
         expect(result.errorMessage).toBe('');
 
         const contractAddress = await getContractAddress(name);
-        expect(contractAddress).toBe(PlatformAccount);
+        expect(contractAddress).toBe(platformAccount);
     });
 })
