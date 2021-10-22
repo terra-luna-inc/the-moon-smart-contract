@@ -5,8 +5,6 @@ import {
     emulator,
     deployContractByName,
     getAccountAddress,
-    mintFlow,
-    getContractAddress,
     shallPass,
     sendTransaction,
     shallRevert,
@@ -233,7 +231,7 @@ describe('NftMinter', () => {
     });
 
     describe('bulkMintNfts() function', () => {
-        fit('Successfully bulk mints a collection of nfts when valid input data is supplied', async () => {
+        it('Successfully bulk mints a collection of nfts when valid input data is supplied', async () => {
             const code = `
                 import ${TheMoonNFTContract} from ${platformAccount}
 
@@ -362,7 +360,7 @@ describe('NftMinter', () => {
     });
 
     describe('createNftPack() function', () => {
-        fit('Successfully creates a MoonNftPack with valid inputs supplied', async () => {
+        it('Successfully creates a MoonNftPack with valid inputs supplied', async () => {
             const code = `
                 import ${TheMoonNFTContract} from ${platformAccount}
 
@@ -517,7 +515,7 @@ describe('NftMinter', () => {
     });
 
     describe('createNftPackRelease() function', () => {
-        fit('Successfully creates a MoonNftRelease when all valid arguments are passed in', async () => {
+        it('Successfully creates a MoonNftRelease when all valid arguments are passed in', async () => {
             const code = `
                 import ${TheMoonNFTContract} from ${platformAccount}
 

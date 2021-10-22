@@ -4,7 +4,7 @@
   "description": "cadence smart contract and all its tests for the moon nft platform",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "author": "Anthony Obeta",
   "license": "ISC",
@@ -16,6 +16,7 @@
     "babel-jest": "^27.3.1",
     "flow-js-testing": "^0.1.14",
     "jest": "^27.3.1",
+    "jest-extended": "^1.1.0",
     "regenerator-runtime": "^0.13.9"
   }
 }
