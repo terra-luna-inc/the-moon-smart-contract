@@ -13,6 +13,7 @@ import {
 } from "flow-js-testing";
 import { getTransactionEventName, initializePlatformAccount, deployNftContract, getTransactionEventData } from '../testHelpers';
 
+jest.setTimeout(20000);
 expect.extend(matchers);
 
 const platformAccountName = "PlatformAccount";

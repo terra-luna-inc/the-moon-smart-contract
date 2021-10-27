@@ -13,6 +13,7 @@ import {
 } from "flow-js-testing";
 import { getTransactionEventName, initializePlatformAccount, deployNftContract, getTransactionEventData } from '../testHelpers';
 
+jest.setTimeout(10000);
 expect.extend(matchers);
 
 const platformAccountName = "PlatformAccount";
@@ -100,7 +101,7 @@ describe('AdminMintedCollection Resource and QueryMintedCollection interface', (
                     sendTransaction({ code, signers })
                 );
 
-                const relevantEvents = result.events.filter(event => getTransactionEventName(event.type) ===  "NftGroupDataCreated");
+                const relevantEvents = result.events.filter(event => getTransactionEventName(event.type) ===  "AdminMintedCollection_NftGroupDeposited");
 
                 expect(relevantEvents.length).toBe(1);
             });
@@ -395,7 +396,7 @@ describe('AdminMintedCollection Resource and QueryMintedCollection interface', (
                     sendTransaction({ code: pickCode, signers : [platformAccount] })
                 );
 
-                const relevantEvents = pickResult.events.filter(event => getTransactionEventName(event.type) ===  "MoonNftsPicked");
+                const relevantEvents = pickResult.events.filter(event => getTransactionEventName(event.type) ===  "AdminMintedCollection_MoonNftsPicked");
 
                 expect(relevantEvents.length).toBe(1);
             });
@@ -586,7 +587,7 @@ describe('AdminMintedCollection Resource and QueryMintedCollection interface', (
                     sendTransaction({ code: pickCode, signers : [platformAccount] })
                 );
 
-                const relevantEvents = pickResult.events.filter(event => getTransactionEventName(event.type) ===  "MoonNftsPicked");
+                const relevantEvents = pickResult.events.filter(event => getTransactionEventName(event.type) ===  "AdminMintedCollection_MoonNftsPicked");
 
                 expect(relevantEvents.length).toBe(1);
             });
@@ -910,7 +911,7 @@ describe('AdminMintedCollection Resource and QueryMintedCollection interface', (
 
             const result = await sendTransaction({ code, signers : [platformAccount] })
 
-            const relevantEventData = getTransactionEventData(result, "NftGroupDataCreated");
+            const relevantEventData = getTransactionEventData(result, "AdminMintedCollection_NftGroupDeposited");
 
             return relevantEventData;
         };

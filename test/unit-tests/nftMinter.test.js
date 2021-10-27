@@ -11,6 +11,8 @@ import {
 } from "flow-js-testing";
 import { getTransactionEventName, initializePlatformAccount } from '../testHelpers';
 
+jest.setTimeout(10000);
+
 const platformAccountName = "PlatformAccount";
 const TheMoonNFTContract = "TheMoonNFTContract";
 
@@ -124,7 +126,7 @@ describe('NftMinter', () => {
                 sendTransaction({ code, signers })
             );
 
-            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "MoonNftMinted");
+            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "NftMinter_MoonNftMinted");
 
             expect(relevantEvents.length).toBe(1);
         });
@@ -278,7 +280,7 @@ describe('NftMinter', () => {
                 sendTransaction({ code, signers })
             );
 
-            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "MoonNftMinted");
+            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "NftMinter_MoonNftMinted");
 
             expect(relevantEvents.length).toBe(2);
         });
@@ -419,7 +421,7 @@ describe('NftMinter', () => {
                 sendTransaction({ code, signers })
             );
 
-            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "MoonNftPackCreated");
+            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "NftMinter_MoonNftPackCreated");
 
             expect(relevantEvents.length).toBe(1);
         });
@@ -578,7 +580,7 @@ describe('NftMinter', () => {
                 sendTransaction({ code, signers })
             );
 
-            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "MoonNftPackReleaseCreated");
+            const relevantEvents = txResult.events.filter(event => getTransactionEventName(event.type) ===  "NftMinter_MoonNftPackReleaseCreated");
 
             expect(relevantEvents.length).toBe(1);
         });
