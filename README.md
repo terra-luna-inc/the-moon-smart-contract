@@ -1,5 +1,5 @@
 # The Moon Smart Contract for the Flow Blockchain
-This repository contains the smart contract code for The Moon. An upcoming Nft Platform that is approaching general release in November - December 2021
+This repository contains the smart contract code for The Moon, an upcoming NFT Platform that is approaching general release in November - December 2021
 
 ## Setup
 
