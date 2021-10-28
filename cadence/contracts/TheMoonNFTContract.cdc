@@ -597,6 +597,10 @@ pub contract TheMoonNFTContract {
         }
 
         pub fun depositRelease(_ release: @MoonNftRelease) {
+            pre {
+                !self.packReleasesForSale.containsKey(release.id) : "There is already a release with Id ".concat(release.id).concat(" Present")
+            }
+
             let releaseData = release.getData()
 
             if (release.packData.creator != nil) {
@@ -920,6 +924,28 @@ pub contract TheMoonNFTContract {
             destroy nfts
         }
 
+        pub fun addMoreNftsToDepositedGroup (_ groupId : String, nfts: @[MoonNft]) {
+            pre {
+                self.groupIdExists(groupId: groupId) : "cannot append to group that does not exist"
+            }
+
+            let nftIds = self.groupNftIds[groupId]!
+
+            while nfts.length > 0 {
+                let nft <- nfts.removeLast()
+                nftIds.insert(key: nft.id, nft.id);
+
+                let nullNft <- self.nfts[nft.id] <- nft
+
+                destroy nullNft
+            }
+
+            self.groupNftIds[groupId] = nftIds
+
+            emit AdminMintedCollection_NftGroupUpdated(data: self.getGroupInfo(groupId))
+            destroy nfts
+        }
+
         pub fun getAllNftIds() : [UInt64] {
             return self.nfts.keys
         }
@@ -1140,6 +1166,8 @@ pub contract TheMoonNFTContract {
     pub event AssetCollection_NftPackWithdrawn(data: MoonNftPackData)
 
     pub event AdminMintedCollection_NftGroupDeposited(data: NftGroupData)
+
+    pub event AdminMintedCollection_NftGroupUpdated(data: NftGroupData)
 
     pub event AssetCollection_MoonNftPackOpened(data: MoonNftPackData)
 
