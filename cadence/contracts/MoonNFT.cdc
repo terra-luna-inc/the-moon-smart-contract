@@ -21,7 +21,7 @@ pub contract MoonNFT: NonFungibleToken {
 
     pub resource NFT : NonFungibleToken.INFT {
         pub let id: UInt64
-        pub let data: NFTData
+        pub let data: MoonNftData
 
         access(contract) init(
             _ initID: UInt64,
@@ -38,7 +38,7 @@ pub contract MoonNFT: NonFungibleToken {
             }
 
             self.id = initID
-            self.data = NFTData(
+            self.data = MoonNftData(
                 initID,
                 mediaUrl,
                 creator: originalContentCreator,
@@ -48,7 +48,7 @@ pub contract MoonNFT: NonFungibleToken {
         }
     }
 
-    pub struct NFTData {
+    pub struct MoonNftData {
         pub let id: UInt64?
         pub let originalContentCreator: String
         pub let creatorId: Int32
@@ -286,7 +286,7 @@ pub contract MoonNFT: NonFungibleToken {
                     "Cannot borrow MoonNft reference: The ID of the returned reference is incorrect"
             }
         }
-        pub fun getDataForAllNfts() : [NFTData]
+        pub fun getDataForAllNfts() : [MoonNftData]
 
         pub fun getNftPackIds(): [UInt64]
         pub fun getNftPackData(id: UInt64) : MoonNftPackData
@@ -351,8 +351,8 @@ pub contract MoonNFT: NonFungibleToken {
            }
         }
 
-        pub fun getDataForAllNfts() : [NFTData] {
-            let nftData : [NFTData] = []
+        pub fun getDataForAllNfts() : [MoonNftData] {
+            let nftData : [MoonNftData] = []
 
             for key in self.ownedNFTs.keys {
                 let nft = self.borrowMoonNft(id: key)
@@ -412,7 +412,7 @@ pub contract MoonNFT: NonFungibleToken {
             return <- nftPack
         }
 
-        pub fun openPackAndDepositNfts (packId: UInt64) : [NFTData]{
+        pub fun openPackAndDepositNfts (packId: UInt64) : [MoonNftData]{
             pre {
                 self.packIdExists(packId) : "Cannot open pack that doesnt exist in your collection"
             }
@@ -421,7 +421,7 @@ pub contract MoonNFT: NonFungibleToken {
             let packData = pack.getData()
             let packNfts <- pack.exportNftsFromPack()
 
-            let nftData : [NFTData] = []
+            let nftData : [MoonNftData] = []
 
             while packNfts.length > 0 {
                 let nft <- packNfts.removeFirst()
@@ -443,8 +443,8 @@ pub contract MoonNFT: NonFungibleToken {
     }
 
     pub resource interface SellerCatalog {
-        pub fun getNftsByCreatorId(_ creatorId: Int32) : [NFTData]
-        pub fun getNftsByCreator(_ creator: String) : [NFTData]
+        pub fun getNftsByCreatorId(_ creatorId: Int32) : [MoonNftData]
+        pub fun getNftsByCreator(_ creator: String) : [MoonNftData]
 
         pub fun getPackReleasesByCreatorId(_ creatorId: Int32): [MoonNftReleaseData]
         pub fun getPackReleasesByCreator(_ creator: String): [MoonNftReleaseData]
@@ -455,11 +455,11 @@ pub contract MoonNFT: NonFungibleToken {
         pub fun packReleaseExists(id: String): Bool
 
         pub fun getPackReleaseData(id: String): MoonNftReleaseData
-        pub fun getNftData(id: UInt64): NFTData
+        pub fun getNftData(id: UInt64): MoonNftData
 
         pub fun getCurrentPackIdsAvailableWithinRelease(id: String): [String]
 
-        pub fun getDataForAllNfts(): [NFTData]
+        pub fun getDataForAllNfts(): [MoonNftData]
         pub fun getTotalNFTCount(): Int
         pub fun nftExists(id: UInt64): Bool
     }
@@ -468,10 +468,10 @@ pub contract MoonNFT: NonFungibleToken {
         access(self) let nftsForSale: @{UInt64 : NFT}
         access(self) let packReleasesForSale: @{String : MoonNftRelease}
 
-        access(self) let nftsByCreatorId: {Int32: {UInt64 : NFTData}}
+        access(self) let nftsByCreatorId: {Int32: {UInt64 : MoonNftData}}
         access(self) let packReleasesByCreatorId: {Int32: {String : MoonNftReleaseData}}
 
-        access(self) let nftsByCreator: {String: {UInt64 : NFTData}}
+        access(self) let nftsByCreator: {String: {UInt64 : MoonNftData}}
         access(self) let packReleasesByCreator: {String: {String : MoonNftReleaseData}}
 
         init() {
@@ -517,8 +517,8 @@ pub contract MoonNFT: NonFungibleToken {
             return self.packReleasesForSale.containsKey(id)
         }
 
-        pub fun getDataForAllNfts(): [NFTData] {
-            let nfts: [NFTData] = []
+        pub fun getDataForAllNfts(): [MoonNftData] {
+            let nfts: [MoonNftData] = []
             let nftsForSale: &{UInt64 : NFT} = &self.nftsForSale as &{UInt64 : NFT}
 
             for nftId in nftsForSale.keys {
@@ -589,8 +589,8 @@ pub contract MoonNFT: NonFungibleToken {
                 self.nftsByCreatorId[nft.data.creatorId] = {}
             }
 
-            let creatorDic: &{UInt64 : NFTData} = &self.nftsByCreator[nft.data.originalContentCreator] as &{UInt64 : NFTData}
-            let creatorIdDic: &{UInt64 : NFTData} = &self.nftsByCreatorId[nft.data.creatorId] as &{UInt64 : NFTData}
+            let creatorDic: &{UInt64 : MoonNftData} = &self.nftsByCreator[nft.data.originalContentCreator] as &{UInt64 : MoonNftData}
+            let creatorIdDic: &{UInt64 : MoonNftData} = &self.nftsByCreatorId[nft.data.creatorId] as &{UInt64 : MoonNftData}
 
             creatorDic[nft.id] = nft.data
             creatorIdDic[nft.id] = nft.data
@@ -647,7 +647,7 @@ pub contract MoonNFT: NonFungibleToken {
             return data
         }
 
-        pub fun getNftData(id: UInt64): NFTData {
+        pub fun getNftData(id: UInt64): MoonNftData {
             pre {
                 self.nftExists(id: id) : "Pack does not exist"
             }
@@ -692,7 +692,7 @@ pub contract MoonNFT: NonFungibleToken {
             destroy nfts
         }
 
-        pub fun getNftsByCreatorId(_ creatorId: Int32) : [NFTData] {
+        pub fun getNftsByCreatorId(_ creatorId: Int32) : [MoonNftData] {
             pre {
                 self.nftsByCreatorId.containsKey(creatorId) : "Creator does not have any Nfts within Catalog"
             }
@@ -701,7 +701,7 @@ pub contract MoonNFT: NonFungibleToken {
 
             return creatorIdDic.values
         }
-        pub fun getNftsByCreator(_ creator: String) : [NFTData] {
+        pub fun getNftsByCreator(_ creator: String) : [MoonNftData] {
             pre {
                 self.nftsByCreator.containsKey(creator) : "Creator does not have any Nfts within Catalog"
             }
@@ -774,7 +774,7 @@ pub contract MoonNFT: NonFungibleToken {
             self.packIdCount = self.packIdCount + 1 as UInt64
         }
 
-        pub fun mintNFT (_ nftData: NFTData ): @NFT {
+        pub fun mintNFT (_ nftData: MoonNftData ): @NFT {
             self.incrementTotalSupply()
             let newNFT <- create NFT(
                 MoonNFT.totalSupply,
@@ -788,7 +788,7 @@ pub contract MoonNFT: NonFungibleToken {
             return <-newNFT
         }
 
-        pub fun bulkMintNfts (_ nftsToMint: [NFTData]): @[NFT] {
+        pub fun bulkMintNfts (_ nftsToMint: [MoonNftData]): @[NFT] {
             pre {
                 nftsToMint.length > 0 : "[NftMinter] No NFT's that we can mint"
             }
@@ -865,7 +865,7 @@ pub contract MoonNFT: NonFungibleToken {
     }
 
     pub resource AdminMintedCollection : QueryMintedCollection {
-        access(self) let groupMetadata : {String : NFTData}
+        access(self) let groupMetadata : {String : MoonNftData}
         access(self) let groupNftIds : { String : {UInt64 : UInt64} }
         access(self) let nfts : @{ UInt64 : NFT }
 
@@ -883,7 +883,7 @@ pub contract MoonNFT: NonFungibleToken {
             self.creatorIdToGroupMap = {}
         }
 
-        pub fun depositGroup(_ groupId: String, _ groupMetadata: NFTData, _ nfts: @[NFT]){
+        pub fun depositGroup(_ groupId: String, _ groupMetadata: MoonNftData, _ nfts: @[NFT]){
             pre {
                 nfts.length > 0 : "No NFT's to deposit"
                 groupId != "" : "Invalid groupId"
@@ -1019,7 +1019,7 @@ pub contract MoonNFT: NonFungibleToken {
             }
 
             let pickedNfts : @[NFT] <- []
-            let pickedNftData: [NFTData] = []
+            let pickedNftData: [MoonNftData] = []
 
             while groupIds.length > 0 {
                 let groupId = groupIds.removeFirst()
@@ -1055,7 +1055,7 @@ pub contract MoonNFT: NonFungibleToken {
                 self.groupIdExists(groupId: groupId) : "grouping you are trying to withdraw does not exist"
             }
 
-            let withdrawnNftData : [NFTData] = []
+            let withdrawnNftData : [MoonNftData] = []
             let withdrawnNfts : @[NFT] <- []
             let nftIds = self.groupNftIds[groupId]!
 
@@ -1109,9 +1109,9 @@ pub contract MoonNFT: NonFungibleToken {
     pub struct NftGroupData {
         pub let groupId : String
         pub let nftIds : [UInt64]
-        pub let metadata : NFTData
+        pub let metadata : MoonNftData
 
-        init (_ groupId: String, _ nftIds: [UInt64], _ metadata: NFTData) {
+        init (_ groupId: String, _ nftIds: [UInt64], _ metadata: MoonNftData) {
             self.groupId = groupId
             self.nftIds = nftIds
             self.metadata = metadata
@@ -1150,9 +1150,9 @@ pub contract MoonNFT: NonFungibleToken {
         emit ContractInitialized()
     }
 
-    pub event NftMinter_MoonNftMinted(data: NFTData)
+    pub event NftMinter_MoonNftMinted(data: MoonNftData)
 
-    pub event AdminMintedCollection_MoonNftsPicked(data: [NFTData])
+    pub event AdminMintedCollection_MoonNftsPicked(data: [MoonNftData])
 
     pub event NftMinter_MoonNftPackCreated(data: MoonNftPackData)
 
@@ -1160,15 +1160,15 @@ pub contract MoonNFT: NonFungibleToken {
 
     pub event SellerCatalog_ReleaseDeposited (data: MoonNftReleaseData)
 
-    pub event SellerCatalog_NftDeposited (data: NFTData)
+    pub event SellerCatalog_NftDeposited (data: MoonNftData)
 
     pub event SellerCatalog_ReleaseWithdrawn (data: MoonNftReleaseData)
 
-    pub event SellerCatalog_NftWithdrawn (data: NFTData)
+    pub event SellerCatalog_NftWithdrawn (data: MoonNftData)
 
     pub event AssetCollection_NftPackDeposit(data: MoonNftPackData)
 
-    pub event AssetCollection_NftWithdrawn(data: NFTData)
+    pub event AssetCollection_NftWithdrawn(data: MoonNftData)
 
     pub event AssetCollection_NftPackWithdrawn(data: MoonNftPackData)
 
@@ -1178,7 +1178,7 @@ pub contract MoonNFT: NonFungibleToken {
 
     pub event AssetCollection_MoonNftPackOpened(data: MoonNftPackData)
 
-    pub event AssetCollection_MoonNftDeposit(data: NFTData)
+    pub event AssetCollection_MoonNftDeposit(data: MoonNftData)
 
     // Event that emitted when the NFT contract is initialized
     //
