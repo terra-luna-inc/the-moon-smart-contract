@@ -9,19 +9,12 @@ import {
     sendTransaction,
     shallRevert,
 } from "flow-js-testing";
-import { getTransactionEventName, initializePlatformAccount } from '../testHelpers';
+import { getTransactionEventName, initializePlatformAccount, deployNftContract } from '../testHelpers';
 
 jest.setTimeout(10000);
 
 const platformAccountName = "PlatformAccount";
-const TheMoonNFTContract = "TheMoonNFTContract";
-
-const deployNftContract = async (platformAccount) => {
-    await deployContractByName({
-        to: platformAccount,
-        name: TheMoonNFTContract,
-    });
-}
+const MoonNFT = "MoonNFT";
 
 describe('NftMinter', () => {
     let platformAccount;
@@ -34,7 +27,7 @@ describe('NftMinter', () => {
         await emulator.start(port);
 
         platformAccount = await initializePlatformAccount();
-        await deployNftContract(platformAccount);
+        await deployNftContract(platformAccount, MoonNFT);
     });
 
     afterEach(async () => {
@@ -42,15 +35,15 @@ describe('NftMinter', () => {
     })
 
     describe('NftMinter access', () => {
-        it(`Allows only the account that deployed ${TheMoonNFTContract} to access the NftMinter`, async () => {
+        it(`Allows only the account that deployed ${MoonNFT} to access the NftMinter`, async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
@@ -69,13 +62,13 @@ describe('NftMinter', () => {
             const testAccount = await getAccountAddress("Test");
 
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
@@ -94,18 +87,18 @@ describe('NftMinter', () => {
     describe('mintNFT() function', () => {
         it(`Successfully mints a MoonNft`, async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let nftData = TheMoonNFTContract.MoonNftData(
+                        let nftData = MoonNFT.MoonNftData(
                             0,
                             "url",
                             creator: "testCreator",
@@ -136,18 +129,18 @@ describe('NftMinter', () => {
 
             // second parameter of MoonNftData is empty string
             let code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let nftData = TheMoonNFTContract.MoonNftData(
+                        let nftData = MoonNFT.MoonNftData(
                             0,
                             "",
                             creator: "testCreator",
@@ -168,18 +161,18 @@ describe('NftMinter', () => {
 
             // third parameter is empty string. This should be invalid
             code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let nftData = TheMoonNFTContract.MoonNftData(
+                        let nftData = MoonNFT.MoonNftData(
                             0,
                             "url",
                             creator: "",
@@ -200,18 +193,18 @@ describe('NftMinter', () => {
 
             // fourth parameter "creatorId" is 0. This should be invalid
             code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let nftData = TheMoonNFTContract.MoonNftData(
+                        let nftData = MoonNFT.MoonNftData(
                             0,
                             "url",
                             creator: "testCreator",
@@ -235,20 +228,20 @@ describe('NftMinter', () => {
     describe('bulkMintNfts() function', () => {
         it('Successfully bulk mints a collection of nfts when valid input data is supplied', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let inputData : [TheMoonNFTContract.MoonNftData] = []
+                        let inputData : [MoonNFT.MoonNftData] = []
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator1",
@@ -258,7 +251,7 @@ describe('NftMinter', () => {
                         )
 
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator2",
@@ -287,13 +280,13 @@ describe('NftMinter', () => {
 
         it('Fails to bulk mint a collection of nfts when an empty collection is supplied as an argument', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
@@ -314,20 +307,20 @@ describe('NftMinter', () => {
 
         it('Fails to bulk mint a collection of nfts when invalid nft data is supplied as an argument ', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let inputData : [TheMoonNFTContract.MoonNftData] = []
+                        let inputData : [MoonNFT.MoonNftData] = []
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "",
                                 creator: "testCreator1",
@@ -337,7 +330,7 @@ describe('NftMinter', () => {
                         )
 
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator2",
@@ -364,20 +357,20 @@ describe('NftMinter', () => {
     describe('createNftPack() function', () => {
         it('Successfully creates a MoonNftPack with valid inputs supplied', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let inputData : [TheMoonNFTContract.MoonNftData] = []
+                        let inputData : [MoonNFT.MoonNftData] = []
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator1",
@@ -387,7 +380,7 @@ describe('NftMinter', () => {
                         )
 
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator2",
@@ -399,7 +392,7 @@ describe('NftMinter', () => {
                         let nfts <- self.minterRef.bulkMintNfts(inputData)
 
 
-                        let packData = TheMoonNFTContract.MoonNftPackData(
+                        let packData = MoonNFT.MoonNftPackData(
                             0,
                             [],
                             "url",
@@ -428,13 +421,13 @@ describe('NftMinter', () => {
 
         it('Fails to create a MoonNftPack when an empty collection of Nfts is supplied as an argument', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
@@ -457,20 +450,20 @@ describe('NftMinter', () => {
 
         it('Fails to creates a MoonNftPack when invalid pack data is supplied as an argument', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let inputData : [TheMoonNFTContract.MoonNftData] = []
+                        let inputData : [MoonNFT.MoonNftData] = []
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator1",
@@ -480,7 +473,7 @@ describe('NftMinter', () => {
                         )
 
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator2",
@@ -492,7 +485,7 @@ describe('NftMinter', () => {
                         let nfts <- self.minterRef.bulkMintNfts(inputData)
 
 
-                        let packData = TheMoonNFTContract.MoonNftPackData(
+                        let packData = MoonNFT.MoonNftPackData(
                             0,
                             [],
                             "",
@@ -519,20 +512,20 @@ describe('NftMinter', () => {
     describe('createNftPackRelease() function', () => {
         it('Successfully creates a MoonNftRelease when all valid arguments are passed in', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let inputData : [TheMoonNFTContract.MoonNftData] = []
+                        let inputData : [MoonNFT.MoonNftData] = []
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator1",
@@ -542,7 +535,7 @@ describe('NftMinter', () => {
                         )
 
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator2",
@@ -554,7 +547,7 @@ describe('NftMinter', () => {
                         let nfts <- self.minterRef.bulkMintNfts(inputData)
 
 
-                        let packData = TheMoonNFTContract.MoonNftPackData(
+                        let packData = MoonNFT.MoonNftPackData(
                             0,
                             [],
                             "url",
@@ -587,18 +580,18 @@ describe('NftMinter', () => {
 
         it('Fails to create a MoonNftRelease when an empty collection of nfts is passed as an argument', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let packData = TheMoonNFTContract.MoonNftPackData(
+                        let packData = MoonNFT.MoonNftPackData(
                             0,
                             [],
                             "url",
@@ -623,20 +616,20 @@ describe('NftMinter', () => {
 
         it('Fails to create a MoonNftRelease when an invalid release id is passed as an argument', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let inputData : [TheMoonNFTContract.MoonNftData] = []
+                        let inputData : [MoonNFT.MoonNftData] = []
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator1",
@@ -646,7 +639,7 @@ describe('NftMinter', () => {
                         )
 
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator2",
@@ -658,7 +651,7 @@ describe('NftMinter', () => {
                         let nfts <- self.minterRef.bulkMintNfts(inputData)
 
 
-                        let packData = TheMoonNFTContract.MoonNftPackData(
+                        let packData = MoonNFT.MoonNftPackData(
                             0,
                             [],
                             "url",
@@ -687,20 +680,20 @@ describe('NftMinter', () => {
 
         it('Fails to create a MoonNftRelease when an invalid nft mapping is passed as an argument', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let inputData : [TheMoonNFTContract.MoonNftData] = []
+                        let inputData : [MoonNFT.MoonNftData] = []
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator1",
@@ -710,7 +703,7 @@ describe('NftMinter', () => {
                         )
 
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator2",
@@ -722,7 +715,7 @@ describe('NftMinter', () => {
                         let nfts <- self.minterRef.bulkMintNfts(inputData)
 
 
-                        let packData = TheMoonNFTContract.MoonNftPackData(
+                        let packData = MoonNFT.MoonNftPackData(
                             0,
                             [],
                             "url",
@@ -752,20 +745,20 @@ describe('NftMinter', () => {
 
         it('Fails to create a MoonNftRelease when an invalid price is passed as an argument', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let inputData : [TheMoonNFTContract.MoonNftData] = []
+                        let inputData : [MoonNFT.MoonNftData] = []
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator1",
@@ -775,7 +768,7 @@ describe('NftMinter', () => {
                         )
 
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator2",
@@ -787,7 +780,7 @@ describe('NftMinter', () => {
                         let nfts <- self.minterRef.bulkMintNfts(inputData)
 
 
-                        let packData = TheMoonNFTContract.MoonNftPackData(
+                        let packData = MoonNFT.MoonNftPackData(
                             0,
                             [],
                             "url",
@@ -817,20 +810,20 @@ describe('NftMinter', () => {
 
         it('Fails to create a MoonNftRelease when an invalid release data is passed as an argument', async () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction() {
-                    let minterRef: &TheMoonNFTContract.NftMinter
+                    let minterRef: &MoonNFT.NftMinter
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&TheMoonNFTContract.NftMinter>(from: TheMoonNFTContract.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&MoonNFT.NftMinter>(from: MoonNFT.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
                     }
 
                     execute {
-                        let inputData : [TheMoonNFTContract.MoonNftData] = []
+                        let inputData : [MoonNFT.MoonNftData] = []
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator1",
@@ -840,7 +833,7 @@ describe('NftMinter', () => {
                         )
 
                         inputData.append(
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator2",
@@ -852,7 +845,7 @@ describe('NftMinter', () => {
                         let nfts <- self.minterRef.bulkMintNfts(inputData)
 
 
-                        let packData = TheMoonNFTContract.MoonNftPackData(
+                        let packData = MoonNFT.MoonNftPackData(
                             0,
                             [],
                             "",
