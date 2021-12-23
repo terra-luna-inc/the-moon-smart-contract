@@ -4,7 +4,11 @@ pub contract MoonNFT: NonFungibleToken {
 
      pub var totalSupply: UInt64
     // Path for the receiver capability
-    pub let NFT_RECEIVER_PUBLIC_PATH: PublicPath
+    pub let MOON_PUBLIC_COLLECTION_PUBLIC_PATH: PublicPath
+    pub let PUBLIC_COLLECTION_PUBLIC_PATH: PublicPath
+
+    pub let COLLECTION_PROVIDER_PRIVATE_PATH: PrivatePath
+    pub let COLLECTION_RECEIVER_PUBLIC_PATH: PublicPath
     // Path for the QueryMintedCollection
     pub let QUERY_MINTED_COLLECTION_PATH: PublicPath
     // Path for seller catalog capability
@@ -1125,18 +1129,30 @@ pub contract MoonNFT: NonFungibleToken {
     init() {
         self.totalSupply = 0
 
-        self.NFT_RECEIVER_PUBLIC_PATH = /public/NftReceiver
-        self.SELLER_CATALOG_PATH = /public/SellerCatalog
-        self.QUERY_MINTED_COLLECTION_PATH = /public/QueryMintedCollection
+        self.MOON_PUBLIC_COLLECTION_PUBLIC_PATH = /public/MoonNftPlatform_CrimsonZone_v1_MoonCollectionPublic
+        self.PUBLIC_COLLECTION_PUBLIC_PATH = /public/MoonNftPlatform_CrimsonZone_v1_CollectionPublic
 
-        self.ASSET_COLLECTION_STORAGE_PATH = /storage/MoonNFTCollection
-        self.MINTER_STORAGE_PATH = /storage/NftMinter
-        self.SINGLE_PLATFORM_SELLER_PATH = /storage/PlatformSeller
-        self.ADMIN_MINT_COLLECTION_PATH = /storage/AdminMintedCollection
+        self.COLLECTION_PROVIDER_PRIVATE_PATH = /private/MoonNftPlatform_CrimsonZone_v1_Provider
+        self.COLLECTION_RECEIVER_PUBLIC_PATH = /public/MoonNftPlatform_CrimsonZone_v1_Receiver
 
-        // setup Minting and collecting infrastructure
+        self.SELLER_CATALOG_PATH = /public/MoonNftPlatform_CrimsonZone_v1_SellerCatalog
+        self.QUERY_MINTED_COLLECTION_PATH = /public/MoonNftPlatform_CrimsonZone_v1_QueryMintedCollection
+
+        self.ASSET_COLLECTION_STORAGE_PATH = /storage/MoonNftPlatform_CrimsonZone_v1_MoonNFTCollection
+        self.MINTER_STORAGE_PATH = /storage/MoonNftPlatform_CrimsonZone_v1_NftMinter
+        self.SINGLE_PLATFORM_SELLER_PATH = /storage/MoonNftPlatform_CrimsonZone_v1_PlatformSeller
+        self.ADMIN_MINT_COLLECTION_PATH = /storage/MoonNftPlatform_CrimsonZone_v1_AdminMintedCollection
+
+        // setup Collection infrastructure
         self.account.save(<- self.createEmptyCollection(), to: self.ASSET_COLLECTION_STORAGE_PATH)
-        self.account.link<&{MoonNFT.MoonCollectionPublic}>(self.NFT_RECEIVER_PUBLIC_PATH, target: self.ASSET_COLLECTION_STORAGE_PATH)
+        self.account.link<&{MoonNFT.MoonCollectionPublic}>(self.MOON_PUBLIC_COLLECTION_PUBLIC_PATH, target: self.ASSET_COLLECTION_STORAGE_PATH)
+
+        // setup NonFungibleToken Infrastructure
+        self.account.link<&{NonFungibleToken.CollectionPublic}>(self.PUBLIC_COLLECTION_PUBLIC_PATH, target: self.ASSET_COLLECTION_STORAGE_PATH)
+        self.account.link<&{NonFungibleToken.Provider}>(self.COLLECTION_PROVIDER_PRIVATE_PATH, target: self.ASSET_COLLECTION_STORAGE_PATH)
+        self.account.link<&{NonFungibleToken.Receiver}>(self.COLLECTION_RECEIVER_PUBLIC_PATH, target: self.ASSET_COLLECTION_STORAGE_PATH)
+
+        // setup minting infrastructure
         self.account.save(<-create NftMinter(), to: self.MINTER_STORAGE_PATH)
 
         // setup seller infrastructure
