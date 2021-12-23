@@ -85,7 +85,7 @@ pub contract MoonNFT: NonFungibleToken {
         pub let creatorId: Int32?
 
 
-        init (
+        access(contract) init (
             _ packId: UInt64,
             _ initialPack : @[NFT],
             _ previewMediaUrl: String,
@@ -179,7 +179,7 @@ pub contract MoonNFT: NonFungibleToken {
         pub let packData: MoonNftPackData
         access(self) var price: Int
 
-        init(
+        access(contract) init(
             id: String?
             _ packGroupings: @{ String : MoonNftPack},
             _ packData: MoonNftPackData,
@@ -480,7 +480,7 @@ pub contract MoonNFT: NonFungibleToken {
         access(self) let nftsByCreator: {String: {UInt64 : MoonNftData}}
         access(self) let packReleasesByCreator: {String: {String : MoonNftReleaseData}}
 
-        init() {
+        access(contract) init() {
             self.packReleasesForSale <- {}
             self.nftsForSale <- {}
 
@@ -880,7 +880,7 @@ pub contract MoonNFT: NonFungibleToken {
         // mapping creatorId to groupIds
         access(self) let creatorIdToGroupMap : { Int32 : { String : Bool }}
 
-        init () {
+        access(contract) init () {
             self.groupMetadata = {}
             self.groupNftIds = {}
             self.nfts <- {}
