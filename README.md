@@ -25,7 +25,7 @@ npm run test <name of test file>
 ## Project Structure
 
 - cadence/contracts : contains smart contract
-- test/resources: contains tests for publicly exposed resources of TheMoonSmartContract
+- test/resources: contains tests for publicly exposed resources of MoonNFT smart contract
 - test/user-stories: contains tests for common user flows
 
 ## Environment

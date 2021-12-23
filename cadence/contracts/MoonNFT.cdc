@@ -546,7 +546,7 @@ pub contract MoonNFT: NonFungibleToken {
 
         pub fun withdrawRelease(id packId: String): @MoonNftRelease {
             pre {
-                self.packReleaseExists(id: packId) : "Pack does not exist"
+                self.packReleaseExists(id: packId) : "Release does not exist"
             }
 
             let release <- self.packReleasesForSale.remove(key: packId)!
