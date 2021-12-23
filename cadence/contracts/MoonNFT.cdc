@@ -396,9 +396,11 @@ pub contract MoonNFT: NonFungibleToken {
                 self.nftIdExists(withdrawID) : "Cannot withdraw NFT that doesn't exist in your collection"
             }
 
-            let nft <- self.ownedNFTs.remove(key: withdrawID) as! @MoonNFT.NFT
+            let moonNft = self.borrowMoonNft(id: withdrawID)
+            emit AssetCollection_NftWithdrawn(data: moonNft!.data)
 
-            emit AssetCollection_NftWithdrawn(data: nft.data)
+            let nft <- self.ownedNFTs.remove(key: withdrawID)!
+
 
             emit Withdraw(id: withdrawID, from: self.owner?.address)
 
