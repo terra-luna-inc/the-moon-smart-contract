@@ -18,7 +18,8 @@ jest.setTimeout(10000);
 expect.extend(matchers);
 
 const platformAccountName = "PlatformAccount";
-const TheMoonNFTContract = "TheMoonNFTContract";
+const NonFungibleToken = "NonFungibleToken";
+const MoonNFT = "MoonNFT";
 
 let platformAccount;
 
@@ -30,7 +31,9 @@ const initialize = async () => {
     await emulator.start(port);
 
     platformAccount = await initializePlatformAccount(platformAccountName);
-    await deployNftContract(platformAccount, TheMoonNFTContract);
+    const { NftContractAddress } = await deployNftContract(platformAccount, MoonNFT);
+
+    return NftContractAddress;
 }
 
 const shutDown = async () => {
@@ -39,36 +42,36 @@ const shutDown = async () => {
 
 const mintThenDepositNfts = async () => {
     const code = `
-        import ${TheMoonNFTContract} from ${platformAccount}
+        import ${MoonNFT} from ${platformAccount}
 
         transaction() {
-            let minterRef: &${TheMoonNFTContract}.NftMinter
-            let collectionRef: &${TheMoonNFTContract}.AssetCollection
+            let minterRef: &${MoonNFT}.NftMinter
+            let collectionRef: &${MoonNFT}.Collection
 
             prepare(authAccount: AuthAccount) {
-                self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                     panic("Could not borrow nft minter")
 
-                self.collectionRef = authAccount.borrow<&${TheMoonNFTContract}.AssetCollection>(from: ${TheMoonNFTContract}.ASSET_COLLECTION_STORAGE_PATH) ??
+                self.collectionRef = authAccount.borrow<&${MoonNFT}.Collection>(from: ${MoonNFT}.ASSET_COLLECTION_STORAGE_PATH) ??
                     panic("Could not borrow asset collection")
             }
 
             execute {
-                let nftData1 = ${TheMoonNFTContract}.MoonNftData(
+                let nftData1 = ${MoonNFT}.MoonNftData(
                     0,
                     "url",
                     creator: "testCreator",
                     creatorId: 1,
                     metadata: {}
                 )
-                let nftData2 = ${TheMoonNFTContract}.MoonNftData(
+                let nftData2 = ${MoonNFT}.MoonNftData(
                     0,
                     "url",
                     creator: "testCreator2",
                     creatorId: 2,
                     metadata: {}
                 )
-                let nftData3 = ${TheMoonNFTContract}.MoonNftData(
+                let nftData3 = ${MoonNFT}.MoonNftData(
                     0,
                     "url",
                     creator: "testCreator3",
@@ -80,7 +83,7 @@ const mintThenDepositNfts = async () => {
                 let nft2 <- self.minterRef.mintNFT(nftData2)
                 let nft3 <- self.minterRef.mintNFT(nftData3)
 
-                self.collectionRef.depositNfts(tokens: <- [ <- nft1, <- nft2, <- nft3 ])
+                self.collectionRef.bulkDepositNfts(tokens: <- [ <- nft1, <- nft2, <- nft3 ])
             }
         }
     `;
@@ -94,37 +97,37 @@ const mintThenDepositNfts = async () => {
 
 const createThenDepositPacks = async () => {
     const code = `
-        import ${TheMoonNFTContract} from ${platformAccount}
+        import ${MoonNFT} from ${platformAccount}
 
         transaction() {
-            let minterRef: &${TheMoonNFTContract}.NftMinter
-            let collectionRef: &${TheMoonNFTContract}.AssetCollection
+            let minterRef: &${MoonNFT}.NftMinter
+            let collectionRef: &${MoonNFT}.Collection
 
             prepare(authAccount: AuthAccount) {
-                self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                     panic("Could not borrow nft minter")
 
-                self.collectionRef = authAccount.borrow<&${TheMoonNFTContract}.AssetCollection>(from: ${TheMoonNFTContract}.ASSET_COLLECTION_STORAGE_PATH) ??
+                self.collectionRef = authAccount.borrow<&${MoonNFT}.Collection>(from: ${MoonNFT}.ASSET_COLLECTION_STORAGE_PATH) ??
                     panic("Could not borrow asset collection")
             }
 
             execute {
-                let inputData1 : [TheMoonNFTContract.MoonNftData] = [
-                    TheMoonNFTContract.MoonNftData(
+                let inputData1 : [MoonNFT.MoonNftData] = [
+                    MoonNFT.MoonNftData(
                         0,
                         "url1",
                         creator: "testCreator1",
                         creatorId: 1,
                         metadata: {}
                     ),
-                    TheMoonNFTContract.MoonNftData(
+                    MoonNFT.MoonNftData(
                         0,
                         "url2",
                         creator: "testCreator1",
                         creatorId: 1,
                         metadata: {}
                     ),
-                    TheMoonNFTContract.MoonNftData(
+                    MoonNFT.MoonNftData(
                         0,
                         "url3",
                         creator: "testCreator1",
@@ -133,22 +136,22 @@ const createThenDepositPacks = async () => {
                     )
                 ]
 
-                let inputData2 : [TheMoonNFTContract.MoonNftData] = [
-                    TheMoonNFTContract.MoonNftData(
+                let inputData2 : [MoonNFT.MoonNftData] = [
+                    MoonNFT.MoonNftData(
                         0,
                         "url1",
                         creator: "testCreator2",
                         creatorId: 2,
                         metadata: {}
                     ),
-                    TheMoonNFTContract.MoonNftData(
+                    MoonNFT.MoonNftData(
                         0,
                         "url2",
                         creator: "testCreator2",
                         creatorId: 2,
                         metadata: {}
                     ),
-                    TheMoonNFTContract.MoonNftData(
+                    MoonNFT.MoonNftData(
                         0,
                         "url3",
                         creator: "testCreator2",
@@ -161,7 +164,7 @@ const createThenDepositPacks = async () => {
                 let nfts1 <- self.minterRef.bulkMintNfts(inputData1)
                 let nfts2 <- self.minterRef.bulkMintNfts(inputData2)
 
-                let packData1 = TheMoonNFTContract.MoonNftPackData(
+                let packData1 = MoonNFT.MoonNftPackData(
                     0,
                     [],
                     "preview_url",
@@ -170,7 +173,7 @@ const createThenDepositPacks = async () => {
                     creatorId: 1
                 )
 
-                let packData2 = TheMoonNFTContract.MoonNftPackData(
+                let packData2 = MoonNFT.MoonNftPackData(
                     0,
                     [],
                     "preview_url",
@@ -195,62 +198,98 @@ const createThenDepositPacks = async () => {
     return relevantEvents; // returns [MoonNftPackData]
 };
 
-describe('AssetCollection resource and NftReciever resource interface', () => {
-    describe('AssetCollection resource methods (Methods not implemented from NftReciever)', () => {
+const addNftReceiverToAccount = async (account, NftAddress) => {
+    const code =   `
+        import ${MoonNFT} from ${platformAccount}
+        import ${NonFungibleToken} from ${NftAddress}
+
+        transaction {
+            let userAccount: AuthAccount
+
+            prepare(userAccount: AuthAccount) {
+                self.userAccount = userAccount
+            }
+
+            execute {
+                self.userAccount.save(<- ${MoonNFT}.createEmptyCollection(), to: ${MoonNFT}.ASSET_COLLECTION_STORAGE_PATH)
+
+                self.userAccount.link<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH, target: ${MoonNFT}.ASSET_COLLECTION_STORAGE_PATH)
+
+                // setup NonFungibleToken Infrastructure
+                self.userAccount.link<&{${NonFungibleToken}.CollectionPublic}>(${MoonNFT}.PUBLIC_COLLECTION_PUBLIC_PATH, target: ${MoonNFT}.ASSET_COLLECTION_STORAGE_PATH)
+                self.userAccount.link<&{${NonFungibleToken}.Provider}>(${MoonNFT}.COLLECTION_PROVIDER_PRIVATE_PATH, target: ${MoonNFT}.ASSET_COLLECTION_STORAGE_PATH)
+                self.userAccount.link<&{${NonFungibleToken}.Receiver}>(${MoonNFT}.COLLECTION_RECEIVER_PUBLIC_PATH, target: ${MoonNFT}.ASSET_COLLECTION_STORAGE_PATH)
+            }
+
+            post {
+                self.userAccount.getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH).check() :
+                    "Account was unsuccessfully linked"
+            }
+        }
+    `;
+
+    await sendTransaction({ code, signers: [account]});
+}
+
+const depositNftWithinInitializedAccount = async (account, initializeAccount = true, NftAddress = '') => {
+    if (initializeAccount) {
+        await addNftReceiverToAccount(account, NftAddress);
+    }
+
+    const code = `
+        import ${MoonNFT} from ${platformAccount}
+
+        transaction(depositAccountAddress: Address) {
+            let minterRef: &${MoonNFT}.NftMinter
+            let recipientNftReceiver: &AnyResource{${MoonNFT}.MoonCollectionPublic}
+
+            prepare(authAccount: AuthAccount) {
+                self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
+                    panic("Could not borrow nft minter")
+
+                self.recipientNftReceiver = getAccount(depositAccountAddress)
+                    .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
+                    .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
+            }
+
+            execute {
+                let nftData1 = ${MoonNFT}.MoonNftData(
+                    0,
+                    "url",
+                    creator: "testCreator",
+                    creatorId: 1,
+                    metadata: {}
+                )
+
+                let nft1 <- self.minterRef.mintNFT(nftData1)
+
+                self.recipientNftReceiver.bulkDepositNfts(tokens: <- [ <- nft1])
+            }
+        }
+    `;
+
+    const result = await sendTransaction({ code, signers: [platformAccount], args:[account]});
+
+    const relevantEvents = getTransactionEventData(result, "AssetCollection_MoonNftDeposit");
+    return relevantEvents[0];
+}
+
+
+
+describe('Collection resource and implemented resource interfaces', () => {
+    describe('Collection resource methods (Methods not implemented from MoonCollectionPublic)', () => {
         beforeEach(initialize);
         afterEach(shutDown);
 
-        describe('withdrawNft() method', () => {
-            const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
-
-                transaction(nftId: UInt64) {
-                    let collectionRef: &${TheMoonNFTContract}.AssetCollection
-
-                    prepare(authAccount: AuthAccount) {
-                        self.collectionRef = authAccount.borrow<&${TheMoonNFTContract}.AssetCollection>(from: ${TheMoonNFTContract}.ASSET_COLLECTION_STORAGE_PATH) ??
-                            panic("Could not borrow asset collection")
-                    }
-
-                    execute {
-                        let nft <- self.collectionRef.withdrawNft(id: nftId)
-
-                        destroy nft
-                    }
-                }
-            `;
-
-            it('Successfully withdraws a MoonNft that exists with Asset Collection', async () => {
-                const firstNft = await mintThenDepositNfts();
-
-                const result = await shallPass(
-                    sendTransaction({ code, signers: [platformAccount], args: [firstNft.id]})
-                );
-
-                const relevantEvents = getTransactionEventData(result, "AssetCollection_NftWithdrawn")
-
-                expect(relevantEvents).toBeArrayOfSize(1);
-                expect(relevantEvents).toIncludeSameMembers([firstNft]);
-            });
-
-            it('Throws when trying to withdraw a MoonNftPack that doesnt exist within asset collection', async () => {
-                await mintThenDepositNfts();
-
-                const result = await shallRevert(
-                    sendTransaction({ code, signers: [platformAccount], args: [0]})
-                );
-            });
-        });
-
         describe('withdrawPack() method', () => {
             const withdrawTransactionCode = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction(packId: UInt64) {
-                    let collectionRef: &${TheMoonNFTContract}.AssetCollection
+                    let collectionRef: &${MoonNFT}.Collection
 
                     prepare(authAccount: AuthAccount) {
-                        self.collectionRef = authAccount.borrow<&${TheMoonNFTContract}.AssetCollection>(from: ${TheMoonNFTContract}.ASSET_COLLECTION_STORAGE_PATH) ??
+                        self.collectionRef = authAccount.borrow<&${MoonNFT}.Collection>(from: ${MoonNFT}.ASSET_COLLECTION_STORAGE_PATH) ??
                             panic("Could not borrow asset collection")
                     }
 
@@ -291,13 +330,13 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
 
         describe('openPackAndDepositNfts() method', () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction(packId: UInt64) {
-                    let collectionRef: &${TheMoonNFTContract}.AssetCollection
+                    let collectionRef: &${MoonNFT}.Collection
 
                     prepare(authAccount: AuthAccount) {
-                        self.collectionRef = authAccount.borrow<&${TheMoonNFTContract}.AssetCollection>(from: ${TheMoonNFTContract}.ASSET_COLLECTION_STORAGE_PATH) ??
+                        self.collectionRef = authAccount.borrow<&${MoonNFT}.Collection>(from: ${MoonNFT}.ASSET_COLLECTION_STORAGE_PATH) ??
                             panic("Could not borrow asset collection")
                     }
 
@@ -340,122 +379,54 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
         });
     });
 
-    describe('NftReciever interface methods', () => {
+    describe('MoonCollectionPublic interface methods', () => {
         let testAccount;
+        let NftContractAddress;
 
         beforeEach(async () => {
-            await initialize();
+            NftContractAddress = await initialize();
             testAccount = await getAccountAddress("testAccount");
         });
         afterEach(shutDown);
 
-        const addNftReceiverToAccount = async (account) => {
-            const code =   `
-                import ${TheMoonNFTContract} from ${platformAccount}
-
-                transaction {
-                    let userAccount: AuthAccount
-
-                    prepare(userAccount: AuthAccount) {
-                        self.userAccount = userAccount
-                    }
-
-                    execute {
-                        self.userAccount.save(<- ${TheMoonNFTContract}.createEmptyCollection(), to: ${TheMoonNFTContract}.ASSET_COLLECTION_STORAGE_PATH)
-                        self.userAccount.link<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH, target: ${TheMoonNFTContract}.ASSET_COLLECTION_STORAGE_PATH)
-                    }
-
-                    post {
-                        self.userAccount.getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH).check() :
-                            "Account was unsuccessfully linked"
-                    }
-                }
-            `;
-
-            await sendTransaction({ code, signers: [account]});
-        }
-
-        const depositNftWithinInitializedAccount = async (account, initializeAccount = true) => {
-            if (initializeAccount) {
-                await addNftReceiverToAccount(account);
-            }
-
-            const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
-
-                transaction(depositAccountAddress: Address) {
-                    let minterRef: &${TheMoonNFTContract}.NftMinter
-                    let recipientNftReceiver: &AnyResource{${TheMoonNFTContract}.NftReceiver}
-
-                    prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
-                            panic("Could not borrow nft minter")
-
-                        self.recipientNftReceiver = getAccount(depositAccountAddress)
-                            .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
-                            .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
-                    }
-
-                    execute {
-                        let nftData1 = ${TheMoonNFTContract}.MoonNftData(
-                            0,
-                            "url",
-                            creator: "testCreator",
-                            creatorId: 1,
-                            metadata: {}
-                        )
-
-                        let nft1 <- self.minterRef.mintNFT(nftData1)
-
-                        self.recipientNftReceiver.depositNft(token: <- nft1)
-                    }
-                }
-            `;
-
-            const result = await sendTransaction({ code, signers: [platformAccount], args:[account]});
-
-            const relevantEvents = getTransactionEventData(result, "AssetCollection_MoonNftDeposit");
-            return relevantEvents[0];
-        }
-
         const depositPackWithinInitializedAccount = async (account, initializeAccount = true) => {
             if (initializeAccount) {
-                await addNftReceiverToAccount(account);
+                await addNftReceiverToAccount(account, NftContractAddress);
             }
 
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 transaction(depositAccountAddress: Address) {
-                    let minterRef: &${TheMoonNFTContract}.NftMinter
-                    let recipientNftReceiver: &AnyResource{${TheMoonNFTContract}.NftReceiver}
+                    let minterRef: &${MoonNFT}.NftMinter
+                    let recipientNftReceiver: &AnyResource{${MoonNFT}.MoonCollectionPublic}
 
                     prepare(authAccount: AuthAccount) {
-                        self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                        self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                             panic("Could not borrow nft minter")
 
                         self.recipientNftReceiver = getAccount(depositAccountAddress)
-                            .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
+                            .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
                             .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
                     }
 
                     execute {
-                        let inputData1 : [TheMoonNFTContract.MoonNftData] = [
-                            TheMoonNFTContract.MoonNftData(
+                        let inputData1 : [MoonNFT.MoonNftData] = [
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url1",
                                 creator: "testCreator1",
                                 creatorId: 1,
                                 metadata: {}
                             ),
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url2",
                                 creator: "testCreator1",
                                 creatorId: 1,
                                 metadata: {}
                             ),
-                            TheMoonNFTContract.MoonNftData(
+                            MoonNFT.MoonNftData(
                                 0,
                                 "url3",
                                 creator: "testCreator1",
@@ -466,7 +437,7 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
 
                         let nfts1 <- self.minterRef.bulkMintNfts(inputData1)
 
-                        let packData1 = TheMoonNFTContract.MoonNftPackData(
+                        let packData1 = MoonNFT.MoonNftPackData(
                             0,
                             [],
                             "preview_url",
@@ -488,75 +459,29 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
             return relevantEvents[0];
         }
 
-        describe('depositNft() method', () => {
-            it('Successfully Deposits a MoonNft within an asset collection for another account that has nft receiver capability', async () => {
-                const testUserAccount = await getAccountAddress("testUserAccount");
-                await addNftReceiverToAccount(testUserAccount);
-
-                const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
-
-                    transaction(depositAccountAddress: Address) {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let recipientNftReceiver: &AnyResource{${TheMoonNFTContract}.NftReceiver}
-
-                        prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
-                                panic("Could not borrow nft minter")
-
-                            self.recipientNftReceiver = getAccount(depositAccountAddress)
-                                .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
-                                .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
-                        }
-
-                        execute {
-                            let nftData1 = ${TheMoonNFTContract}.MoonNftData(
-                                0,
-                                "url",
-                                creator: "testCreator",
-                                creatorId: 1,
-                                metadata: {}
-                            )
-
-                            let nft1 <- self.minterRef.mintNFT(nftData1)
-
-                            self.recipientNftReceiver.depositNft(token: <- nft1)
-                        }
-                    }
-                `;
-
-                const result = await shallPass(
-                    sendTransaction({ code, signers: [platformAccount], args: [testUserAccount]})
-                );
-
-                const relevantEvents = getTransactionEventData(result, "AssetCollection_MoonNftDeposit");
-                expect(relevantEvents).toBeArrayOfSize(1);
-            });
-        });
-
-        describe('depositNfts() method', () => {
+        describe('bulkDepositNfts() method', () => {
             it('Successfully Deposits a MoonNfts within an asset collection for another account that has nft receiver capability', async () => {
                 const testUserAccount = await getAccountAddress("testUserAccount");
-                await addNftReceiverToAccount(testUserAccount);
+                await addNftReceiverToAccount(testUserAccount, NftContractAddress);
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(depositAccountAddress: Address) {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let recipientNftReceiver: &AnyResource{${TheMoonNFTContract}.NftReceiver}
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let recipientNftReceiver: &AnyResource{${MoonNFT}.MoonCollectionPublic}
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
 
                             self.recipientNftReceiver = getAccount(depositAccountAddress)
-                                .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
+                                .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
                                 .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
                         }
 
                         execute {
-                            let nftData1 = ${TheMoonNFTContract}.MoonNftData(
+                            let nftData1 = ${MoonNFT}.MoonNftData(
                                 0,
                                 "url",
                                 creator: "testCreator",
@@ -564,7 +489,7 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
                                 metadata: {}
                             )
 
-                            let nftData2 = ${TheMoonNFTContract}.MoonNftData(
+                            let nftData2 = ${MoonNFT}.MoonNftData(
                                 0,
                                 "url",
                                 creator: "testCreator2",
@@ -575,7 +500,7 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
                             let nft1 <- self.minterRef.mintNFT(nftData1)
                             let nft2 <- self.minterRef.mintNFT(nftData2)
 
-                            self.recipientNftReceiver.depositNfts(tokens: <- [<- nft1, <- nft2])
+                            self.recipientNftReceiver.bulkDepositNfts(tokens: <- [<- nft1, <- nft2])
                         }
                     }
                 `;
@@ -592,41 +517,41 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
         describe('depositNftPack() method', () => {
             it('Successfully Deposits a MoonNftPack within an asset collection for another account that has nft receiver capability', async () => {
                 const testUserAccount = await getAccountAddress("testUserAccount");
-                await addNftReceiverToAccount(testUserAccount);
+                await addNftReceiverToAccount(testUserAccount, NftContractAddress);
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(depositAccountAddress: Address) {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let recipientNftReceiver: &AnyResource{${TheMoonNFTContract}.NftReceiver}
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let recipientNftReceiver: &AnyResource{${MoonNFT}.MoonCollectionPublic}
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
 
                             self.recipientNftReceiver = getAccount(depositAccountAddress)
-                                .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
+                                .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
                                 .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
                         }
 
                         execute {
-                            let inputData1 : [TheMoonNFTContract.MoonNftData] = [
-                                TheMoonNFTContract.MoonNftData(
+                            let inputData1 : [MoonNFT.MoonNftData] = [
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
                                     creatorId: 1,
                                     metadata: {}
                                 ),
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url2",
                                     creator: "testCreator1",
                                     creatorId: 1,
                                     metadata: {}
                                 ),
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url3",
                                     creator: "testCreator1",
@@ -637,7 +562,7 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
 
                             let nfts1 <- self.minterRef.bulkMintNfts(inputData1)
 
-                            let packData1 = TheMoonNFTContract.MoonNftPackData(
+                            let packData1 = MoonNFT.MoonNftPackData(
                                 0,
                                 [],
                                 "preview_url",
@@ -664,20 +589,20 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
 
         describe('nftIdExists() method', () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 pub fun main (userAccountAddress: Address, nftId: UInt64) : Bool {
 
-                    let nftReceiver = getAccount(userAccountAddress)
-                        .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
+                    let MoonCollectionPublic = getAccount(userAccountAddress)
+                        .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
                         .borrow() ?? panic("unable to borrow nft receiver")
 
-                    return nftReceiver.nftIdExists(nftId)
+                    return MoonCollectionPublic.nftIdExists(nftId)
                 }
             `;
 
             it('Returns true when checking to see if a MoonNft in the asset collection exists', async () => {
-                const nft = await depositNftWithinInitializedAccount(testAccount);
+                const nft = await depositNftWithinInitializedAccount(testAccount, true, NftContractAddress);
 
                 const exists = await shallResolve(
                     executeScript({ code, args: [testAccount, nft.id]})
@@ -687,7 +612,7 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
             });
 
             it('Returns false when checking to see if a MoonNft in the asset collection does not exists', async () => {
-                await depositNftWithinInitializedAccount(testAccount);
+                await depositNftWithinInitializedAccount(testAccount,true, NftContractAddress);
 
                 const exists = await shallResolve(
                     executeScript({ code, args: [testAccount, 0]})
@@ -699,15 +624,15 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
 
         describe('packIdExists', () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 pub fun main (userAccountAddress: Address, packId: UInt64) : Bool {
 
-                    let nftReceiver = getAccount(userAccountAddress)
-                        .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
+                    let MoonCollectionPublic = getAccount(userAccountAddress)
+                        .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
                         .borrow() ?? panic("unable to borrow nft receiver")
 
-                    return nftReceiver.packIdExists(packId)
+                    return MoonCollectionPublic.packIdExists(packId)
                 }
             `;
 
@@ -722,7 +647,7 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
             });
 
             it('Returns false when checking to see if a pack in the asset collection does not exist', async () => {
-                await depositNftWithinInitializedAccount(testAccount);
+                await depositNftWithinInitializedAccount(testAccount,true, NftContractAddress);
 
                 const exists = await shallResolve(
                     executeScript({ code, args: [testAccount, 0]})
@@ -733,90 +658,22 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
 
         });
 
-        describe('getNftIds() method', () => {
-            const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
-
-                pub fun main (userAccountAddress: Address) : [UInt64] {
-
-                    let nftReceiver = getAccount(userAccountAddress)
-                        .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
-                        .borrow() ?? panic("unable to borrow nft receiver")
-
-                    return nftReceiver.getNftIds()
-                }
-            `;
-
-            it('Returns an empty array when no MoonNfts have been deposited', async () => {
-                await addNftReceiverToAccount(testAccount);
-
-                const nftIds = await (
-                    executeScript({ code, args: [testAccount] })
-                );
-
-                expect(nftIds).toBeArrayOfSize(0);
-            });
-
-            it('Returns a accurate array of nft ids when MoonNfts have been deposited', async () => {
-                const nft = await depositNftWithinInitializedAccount(testAccount);
-
-                const nftIds = await (
-                    executeScript({ code, args: [testAccount] })
-                );
-
-                expect(nftIds).toIncludeSameMembers([nft.id]);
-            });
-        });
-
-        describe('getNftData() method', () => {
-            const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
-
-                pub fun main (userAccountAddress: Address, id: UInt64) : ${TheMoonNFTContract}.MoonNftData {
-
-                    let nftReceiver = getAccount(userAccountAddress)
-                        .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
-                        .borrow() ?? panic("unable to borrow nft receiver")
-
-                    return nftReceiver.getNftData(id: id)
-                }
-            `;
-
-            it('Returns MoonNftData for a MoonNft that exists', async () => {
-                const nft = await depositNftWithinInitializedAccount(testAccount);
-
-                const nftDataResult = await shallResolve(
-                    executeScript({ code, args: [testAccount, nft.id]})
-                );
-
-                expect(nftDataResult).toMatchObject(nft);
-            });
-
-            it('Throws when trying to get MoonNftData for a MoonNft that does not exist', async () => {
-                await depositNftWithinInitializedAccount(testAccount);
-
-                const nftDataResult = await shallThrow(
-                    executeScript({ code, args: [testAccount, 0]})
-                );
-            });
-        });
-
         describe('getDataForAllNfts() method', () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
-                pub fun main (userAccountAddress: Address) : [${TheMoonNFTContract}.MoonNftData] {
+                pub fun main (userAccountAddress: Address) : [${MoonNFT}.MoonNftData] {
 
-                    let nftReceiver = getAccount(userAccountAddress)
-                        .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
+                    let MoonCollectionPublic = getAccount(userAccountAddress)
+                        .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
                         .borrow() ?? panic("unable to borrow nft receiver")
 
-                    return nftReceiver.getDataForAllNfts()
+                    return MoonCollectionPublic.getDataForAllNfts()
                 }
             `;
 
             it('Gets data for all MoonNfts that exist within the asset collection', async () => {
-                const firstNft = await depositNftWithinInitializedAccount(testAccount);
+                const firstNft = await depositNftWithinInitializedAccount(testAccount,true, NftContractAddress);
 
                 let result = await shallResolve(
                     executeScript({ code, args: [testAccount]})
@@ -832,7 +689,7 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
             });
 
             it('Returns an empty array when no Nfts exist in the asset collection', async () => {
-                await addNftReceiverToAccount(testAccount);
+                await addNftReceiverToAccount(testAccount, NftContractAddress);
 
                 const result = await shallResolve(
                     executeScript({ code, args: [testAccount]})
@@ -843,20 +700,20 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
 
         describe('getNftPackIds() method', () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
                 pub fun main (userAccountAddress: Address) : [UInt64] {
 
-                    let nftReceiver = getAccount(userAccountAddress)
-                        .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
+                    let MoonCollectionPublic = getAccount(userAccountAddress)
+                        .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
                         .borrow() ?? panic("unable to borrow nft receiver")
 
-                    return nftReceiver.getNftPackIds()
+                    return MoonCollectionPublic.getNftPackIds()
                 }
             `;
 
             it('Returns an empty array when no MoonNfts have been deposited', async () => {
-                await addNftReceiverToAccount(testAccount);
+                await addNftReceiverToAccount(testAccount, NftContractAddress);
 
                 const nftIds = await (
                     executeScript({ code, args: [testAccount] })
@@ -878,15 +735,15 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
 
         describe('getNftPackData() method', () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
-                pub fun main (userAccountAddress: Address, id: UInt64) : ${TheMoonNFTContract}.MoonNftPackData {
+                pub fun main (userAccountAddress: Address, id: UInt64) : ${MoonNFT}.MoonNftPackData {
 
-                    let nftReceiver = getAccount(userAccountAddress)
-                        .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
+                    let MoonCollectionPublic = getAccount(userAccountAddress)
+                        .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
                         .borrow() ?? panic("unable to borrow nft receiver")
 
-                    return nftReceiver.getNftPackData(id: id)
+                    return MoonCollectionPublic.getNftPackData(id: id)
                 }
             `;
 
@@ -911,15 +768,15 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
 
         describe('getDataForAllPacks() method', () => {
             const code = `
-                import ${TheMoonNFTContract} from ${platformAccount}
+                import ${MoonNFT} from ${platformAccount}
 
-                pub fun main (userAccountAddress: Address) : [${TheMoonNFTContract}.MoonNftPackData] {
+                pub fun main (userAccountAddress: Address) : [${MoonNFT}.MoonNftPackData] {
 
-                    let nftReceiver = getAccount(userAccountAddress)
-                        .getCapability<&{${TheMoonNFTContract}.NftReceiver}>(${TheMoonNFTContract}.NFT_RECEIVER_PUBLIC_PATH)
+                    let MoonCollectionPublic = getAccount(userAccountAddress)
+                        .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
                         .borrow() ?? panic("unable to borrow nft receiver")
 
-                    return nftReceiver.getDataForAllPacks()
+                    return MoonCollectionPublic.getDataForAllPacks()
                 }
             `;
 
@@ -940,12 +797,274 @@ describe('AssetCollection resource and NftReciever resource interface', () => {
             });
 
             it('Returns an empty array when no MoonNftPacks exist in the asset collection', async () => {
-                await addNftReceiverToAccount(testAccount);
+                await addNftReceiverToAccount(testAccount, NftContractAddress);
 
                 const result = await shallResolve(
                     executeScript({ code, args: [testAccount]})
                 );
                 expect(result).toBeArrayOfSize(0);
+            });
+        });
+
+        describe('borrowMoonNft() method', () => {
+            const code = `
+                import ${MoonNFT} from ${platformAccount}
+
+                pub fun main (userAccountAddress: Address, id: UInt64) : UInt64 {
+
+                    let MoonCollectionPublic = getAccount(userAccountAddress)
+                        .getCapability<&{${MoonNFT}.MoonCollectionPublic}>(${MoonNFT}.MOON_PUBLIC_COLLECTION_PUBLIC_PATH)
+                        .borrow() ?? panic("unable to borrow nft receiver")
+
+                    return MoonCollectionPublic.borrowMoonNft(id: id)!.id
+                }
+            `;
+
+            it('Successfully Borrows a valid MoonNft.NFT without', async () => {
+
+                const nft = await depositNftWithinInitializedAccount(testAccount,true, NftContractAddress);
+
+                const result = await shallResolve(
+                    executeScript({ code, args: [testAccount, nft.id]})
+                );
+
+                expect(result).toBe(nft.id);
+            });
+
+            it('Throws when borrowing an MoonNft.NFT that doesnt exist', async () => {
+                await shallThrow(
+                    executeScript({ code, args: [testAccount, 5000]})
+                );
+            });
+        });
+    });
+
+    describe('NonFungibleToken.Provider interface methods', () => {
+        let testAccount;
+        let NftContractAddress;
+
+        beforeEach(async () => {
+            NftContractAddress = await initialize();
+            testAccount = await getAccountAddress("testAccount");
+        });
+        afterEach(shutDown);
+
+        const code = `
+            import ${MoonNFT} from ${platformAccount}
+            import ${NonFungibleToken} from ${NftContractAddress}
+
+            transaction(nftId: UInt64) {
+                let collectionPublic: &AnyResource{${NonFungibleToken}.Provider}
+
+                prepare(authAccount: AuthAccount) {
+
+                    self.collectionPublic = authAccount
+                        .getCapability<&{${NonFungibleToken}.Provider}>(${MoonNFT}.COLLECTION_PROVIDER_PRIVATE_PATH)
+                        .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
+                }
+
+                execute {
+                    let nft <- self.collectionPublic.withdraw(withdrawID: nftId)
+
+                    destroy nft
+                }
+            }
+        `;
+
+        describe('withdraw() method', () => {
+            it('should withdraw an NFT that exists successfully', async () => {
+                const nft = await depositNftWithinInitializedAccount(testAccount, true, NftContractAddress);
+
+                await shallPass(
+                    sendTransaction({ code, signers: [testAccount], args: [nft.id]})
+                );
+            });
+
+            it('Throws when withdrawing an NFT that doesnt exists', async () => {
+                await shallRevert(
+                    sendTransaction({ code, signers: [testAccount], args: [1000]})
+                );
+            });
+        });
+    });
+
+    describe('NonFungibleToken.Receiver interface methods', () => {
+        let testAccount;
+        let NftContractAddress;
+
+        beforeEach(async () => {
+            NftContractAddress = await initialize();
+            testAccount = await getAccountAddress("testAccount");
+        });
+        afterEach(shutDown);
+
+        describe('deposit() method', () => {
+            it('Successfully Deposits a MoonNFT.NFT within an asset collection for another account using the receiver interface', async () => {
+                await addNftReceiverToAccount(testAccount, NftContractAddress);
+
+                const code = `
+                    import ${MoonNFT} from ${platformAccount}
+                    import ${NonFungibleToken} from ${NftContractAddress}
+
+                    transaction(depositAccountAddress: Address) {
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let receiver: &AnyResource{${NonFungibleToken}.Receiver}
+
+                        prepare(authAccount: AuthAccount) {
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
+                                panic("Could not borrow nft minter")
+
+                            self.receiver = getAccount(depositAccountAddress)
+                                .getCapability<&{${NonFungibleToken}.Receiver}>(${MoonNFT}.COLLECTION_RECEIVER_PUBLIC_PATH)
+                                .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
+                        }
+
+                        execute {
+                            let nftData1 = ${MoonNFT}.MoonNftData(
+                                0,
+                                "url",
+                                creator: "testCreator",
+                                creatorId: 1,
+                                metadata: {}
+                            )
+
+                            let nft1 <- self.minterRef.mintNFT(nftData1)
+
+                            self.receiver.deposit(token: <- nft1)
+                        }
+                    }
+                `;
+
+                const result = await shallPass(
+                    sendTransaction({ code, signers: [platformAccount], args: [testAccount]})
+                );
+
+                const relevantEvents = getTransactionEventData(result, "AssetCollection_MoonNftDeposit");
+                expect(relevantEvents).toBeArrayOfSize(1);
+            });
+        });
+    });
+
+    describe('NonFungibleToken.CollectionPublic interface methods', () => {
+        let testAccount;
+        let NftContractAddress;
+
+        beforeEach(async () => {
+            NftContractAddress = await initialize();
+            testAccount = await getAccountAddress("testAccount");
+        });
+        afterEach(shutDown);
+
+        describe('deposit() method', () => {
+            it('Successfully Deposits a MoonNFT.NFT within an asset collection for another account', async () => {
+                await addNftReceiverToAccount(testAccount, NftContractAddress);
+
+                const code = `
+                    import ${MoonNFT} from ${platformAccount}
+                    import ${NonFungibleToken} from ${NftContractAddress}
+
+                    transaction(depositAccountAddress: Address) {
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let collectionPublic: &AnyResource{${NonFungibleToken}.CollectionPublic}
+
+                        prepare(authAccount: AuthAccount) {
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
+                                panic("Could not borrow nft minter")
+
+                            self.collectionPublic = getAccount(depositAccountAddress)
+                                .getCapability<&{${NonFungibleToken}.CollectionPublic}>(${MoonNFT}.PUBLIC_COLLECTION_PUBLIC_PATH)
+                                .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
+                        }
+
+                        execute {
+                            let nftData1 = ${MoonNFT}.MoonNftData(
+                                0,
+                                "url",
+                                creator: "testCreator",
+                                creatorId: 1,
+                                metadata: {}
+                            )
+
+                            let nft1 <- self.minterRef.mintNFT(nftData1)
+
+                            self.collectionPublic.deposit(token: <- nft1)
+                        }
+                    }
+                `;
+
+                const result = await shallPass(
+                    sendTransaction({ code, signers: [platformAccount], args: [testAccount]})
+                );
+
+                const relevantEvents = getTransactionEventData(result, "AssetCollection_MoonNftDeposit");
+                expect(relevantEvents).toBeArrayOfSize(1);
+            });
+        });
+
+        describe('getIDs() method', () => {
+            const code = `
+                import ${MoonNFT} from ${platformAccount}
+                import ${NonFungibleToken} from ${NftContractAddress}
+
+                pub fun main (userAccountAddress: Address) : [UInt64] {
+
+                    let collectionPublic = getAccount(userAccountAddress)
+                        .getCapability<&{${NonFungibleToken}.CollectionPublic}>(${MoonNFT}.PUBLIC_COLLECTION_PUBLIC_PATH)
+                        .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
+
+                    return collectionPublic.getIDs()
+                }
+            `;
+
+            it('Accurately fetches all the NFT Ids in a Collection', async () => {
+                await addNftReceiverToAccount(testAccount, NftContractAddress);
+
+                let result = await shallResolve(
+                    executeScript({ code, args: [testAccount]})
+                );
+
+                expect(result).toBeArrayOfSize(0);
+
+                const nft = await depositNftWithinInitializedAccount(testAccount, false);
+
+                result = await shallResolve(
+                    executeScript({ code, args: [testAccount]})
+                );
+
+                expect(result).toBeArrayOfSize(1);
+                expect(result).toIncludeSameMembers([nft.id]);
+            });
+        });
+
+        describe('borrowNFT', () => {
+            const code = `
+                import ${MoonNFT} from ${platformAccount}
+                import ${NonFungibleToken} from ${NftContractAddress}
+
+                pub fun main (userAccountAddress: Address, nftId: UInt64) : UInt64 {
+
+                    let collectionPublic = getAccount(userAccountAddress)
+                        .getCapability<&{${NonFungibleToken}.CollectionPublic}>(${MoonNFT}.PUBLIC_COLLECTION_PUBLIC_PATH)
+                        .borrow() ?? panic("unable to borrow nft receiver capability for recipient")
+
+                    return collectionPublic.borrowNFT(id: nftId)!.id
+                }
+            `;
+
+            it('Should allow you to borrow an Nft with a valid ID', async () => {
+                const nft = await depositNftWithinInitializedAccount(testAccount, true, NftContractAddress);
+
+                const result = await shallResolve(
+                    executeScript({ code, args: [testAccount, nft.id]})
+                );
+
+                expect(result).toBe(nft.id);
+            });
+
+            it('Throws when trying to borrow an invalid NFT', async () => {
+                shallThrow(
+                    executeScript({ code, args: [testAccount, 5000]})
+                );
             });
         });
     });
