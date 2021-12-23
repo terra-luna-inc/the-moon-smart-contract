@@ -5,6 +5,7 @@ import { init, emulator, deployContractByName, getAccountAddress, mintFlow, getC
 const platformAccountName = "PlatformAccount";
 const NFTAddress = "0xNFTAddress";
 
+jest.setTimeout(10000)
 describe("Deployment", () => {
     let platformAccount, NftAddressAccount;
 

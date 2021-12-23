@@ -785,6 +785,105 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 );
             });
         });
+
+        describe('borrowRelease() method', () => {
+            const depositRelease = async () => {
+                const code = `
+                    import ${MoonNFT} from ${platformAccount}
+
+                    transaction() {
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
+
+                        prepare(authAccount: AuthAccount) {
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
+                                panic("Could not borrow nft minter")
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
+                                panic("Could not borrow the Single Platform Seller")
+                        }
+
+                        execute {
+                            let inputData : [MoonNFT.MoonNftData] = []
+                            inputData.append(
+                                MoonNFT.MoonNftData(
+                                    0,
+                                    "url1",
+                                    creator: "testCreator1",
+                                    creatorId: 1,
+                                    metadata: {}
+                                )
+                            )
+
+                            inputData.append(
+                                MoonNFT.MoonNftData(
+                                    0,
+                                    "url1",
+                                    creator: "testCreator2",
+                                    creatorId: 1,
+                                    metadata: {}
+                                )
+                            )
+
+                            let nfts <- self.minterRef.bulkMintNfts(inputData)
+
+
+                            let packData = MoonNFT.MoonNftPackData(
+                                0,
+                                [],
+                                "url",
+                                title: "packTitle",
+                                creator: "packCreator",
+                                creatorId: 1
+                            )
+
+                            let mappingOfNfts <- {
+                                "pack1UUID" : <- nfts
+                            }
+                            let packRelease <- self.minterRef.createNftPackRelease(id: "release1", <- mappingOfNfts, packData, price: 20)
+
+                            self.platformSeller.depositRelease( <- packRelease)
+
+                        }
+                    }
+                `;
+
+                const result = await sendTransaction({ code, signers: [platformAccount]});
+                const release = getTransactionEventData(result, "SellerCatalog_ReleaseDeposited");
+                return release[0];
+            };
+
+            const borrowCode = `
+                import ${MoonNFT} from ${platformAccount}
+
+                transaction(releaseId: String) {
+                    let platformSeller: &${MoonNFT}.SinglePlatformSeller
+
+                    prepare(authAccount: AuthAccount) {
+                        self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            panic("Could not borrow the Single Platform Seller")
+                    }
+
+                    execute {
+                        let release = self.platformSeller.borrowRelease(releaseId: releaseId)
+                        let releaseId = release.id;
+                    }
+                }
+            `;
+
+            it('Able to borrow a release that exists', async () => {
+                const release = await depositRelease();
+
+                await shallPass(
+                    sendTransaction({ code: borrowCode, signers: [platformAccount], args:[release.id]})
+                )
+            });
+
+            it('Throws an error when trying to borrow a release that doesnt exist', async () => {
+                await shallRevert(
+                    sendTransaction({ code: borrowCode, signers: [platformAccount], args:["blahId"]})
+                )
+            });
+        });
     });
 
     describe('SellerCatalog interface methods', () => {
