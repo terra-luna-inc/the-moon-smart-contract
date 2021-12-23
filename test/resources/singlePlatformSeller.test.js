@@ -17,7 +17,7 @@ jest.setTimeout(20000);
 expect.extend(matchers);
 
 const platformAccountName = "PlatformAccount";
-const TheMoonNFTContract = "TheMoonNFTContract";
+const MoonNFT = "MoonNFT";
 
 let platformAccount;
 
@@ -29,7 +29,7 @@ const initialize = async () => {
     await emulator.start(port);
 
     platformAccount = await initializePlatformAccount(platformAccountName);
-    await deployNftContract(platformAccount, TheMoonNFTContract);
+    await deployNftContract(platformAccount, MoonNFT);
 }
 
 const shutDown = async () => {
@@ -44,21 +44,21 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
         describe('depositNft() method', () => {
             it('Successfully able to deposit a MoonNft', async () => {
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
                         execute {
-                            let inputData = ${TheMoonNFTContract}.MoonNftData(
+                            let inputData = ${MoonNFT}.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
@@ -83,23 +83,23 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
         describe('depositRelease() method', () => {
             it('Successfully able to deposit a MoonNftRelease', async () => {
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
                         execute {
-                            let inputData : [TheMoonNFTContract.MoonNftData] = []
+                            let inputData : [MoonNFT.MoonNftData] = []
                             inputData.append(
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
@@ -109,7 +109,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                             )
 
                             inputData.append(
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator2",
@@ -121,7 +121,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                             let nfts <- self.minterRef.bulkMintNfts(inputData)
 
 
-                            let packData = TheMoonNFTContract.MoonNftPackData(
+                            let packData = MoonNFT.MoonNftPackData(
                                 0,
                                 [],
                                 "url",
@@ -150,21 +150,21 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
         describe('bulkDepositNft() method', () => {
             it('Successfully able to bulk deposit a collection of MoonNfts', async () => {
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
                         execute {
-                            let inputData1 = ${TheMoonNFTContract}.MoonNftData(
+                            let inputData1 = ${MoonNFT}.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
@@ -172,7 +172,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                                     metadata: {}
                             )
 
-                            let inputData2 = ${TheMoonNFTContract}.MoonNftData(
+                            let inputData2 = ${MoonNFT}.MoonNftData(
                                     0,
                                     "url2",
                                     creator: "testCreator2",
@@ -196,16 +196,16 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
 
             it('Fails to bulk deposit an empty collection of MoonNfts', async () => {
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -225,29 +225,29 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
         describe('bulkDepositRelease() method', () => {
             it('Successfully able to bulk deposit a collection of MoonNftReleases', async () => {
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
                         execute {
-                            let inputData1 : [TheMoonNFTContract.MoonNftData] = [
-                                TheMoonNFTContract.MoonNftData(
+                            let inputData1 : [MoonNFT.MoonNftData] = [
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
                                     creatorId: 1,
                                     metadata: {}
                                 ),
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
@@ -255,15 +255,15 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                                     metadata: {}
                                 )
                             ]
-                            let inputData2 : [TheMoonNFTContract.MoonNftData] = [
-                                TheMoonNFTContract.MoonNftData(
+                            let inputData2 : [MoonNFT.MoonNftData] = [
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url2",
                                     creator: "testCreator2",
                                     creatorId: 2,
                                     metadata: {}
                                 ),
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url2",
                                     creator: "testCreator2",
@@ -276,7 +276,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                             let nfts2 <- self.minterRef.bulkMintNfts(inputData2)
 
 
-                            let packData1 = TheMoonNFTContract.MoonNftPackData(
+                            let packData1 = MoonNFT.MoonNftPackData(
                                 0,
                                 [],
                                 "url",
@@ -284,7 +284,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                                 creator: "testCreator1",
                                 creatorId: 1
                             )
-                            let packData2 = TheMoonNFTContract.MoonNftPackData(
+                            let packData2 = MoonNFT.MoonNftPackData(
                                 0,
                                 [],
                                 "url",
@@ -316,16 +316,16 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
 
             it('Fails to bulk deposit an empty collection of MoonNftReleases', async () => {
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -346,23 +346,23 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             const depositRelease = async () => {
                 const releaseId = "release1";
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
                         execute {
-                            let inputData : [TheMoonNFTContract.MoonNftData] = []
+                            let inputData : [MoonNFT.MoonNftData] = []
                             inputData.append(
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
@@ -372,7 +372,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                             )
 
                             inputData.append(
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator2",
@@ -384,7 +384,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                             let nfts <- self.minterRef.bulkMintNfts(inputData)
 
 
-                            let packData = TheMoonNFTContract.MoonNftPackData(
+                            let packData = MoonNFT.MoonNftPackData(
                                 0,
                                 [],
                                 "url",
@@ -413,13 +413,13 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const releaseId = await depositRelease();
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(releaseId: String) {
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -443,13 +443,13 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const releaseId = "releaseId_That_Doesnt_Exits"
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(releaseId: String) {
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -470,21 +470,21 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
         describe('withdrawNft() method', () => {
             const depositNft = async () => {
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
                         execute {
-                            let inputData = ${TheMoonNFTContract}.MoonNftData(
+                            let inputData = ${MoonNFT}.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
@@ -510,13 +510,13 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const nftId = await depositNft();
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(nftId: UInt64) {
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -541,13 +541,13 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const nftId = 10000
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(nftId: UInt64) {
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -572,29 +572,29 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const packId2 = "pack2UUID";
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
                         execute {
                             let inputData1 = [
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
                                     creatorId: 1,
                                     metadata: {}
                                 ),
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
@@ -603,14 +603,14 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                                 )
                             ]
                             let inputData2 = [
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator2",
                                     creatorId: 1,
                                     metadata: {}
                                 ),
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator2",
@@ -622,7 +622,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                             let nfts1 <- self.minterRef.bulkMintNfts(inputData1)
                             let nfts2 <- self.minterRef.bulkMintNfts(inputData2)
 
-                            let packData = TheMoonNFTContract.MoonNftPackData(
+                            let packData = MoonNFT.MoonNftPackData(
                                 0,
                                 [],
                                 "url",
@@ -652,13 +652,13 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Successfully able to withdraw a pack from a release that exists when a specific packUUID is not specified', async () => {
                 const release = await depositRelease()
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(releaseId: String, pId: String?) {
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -678,13 +678,13 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Successfully able to withdraw a pack from a release that exists when a specific packUUID is specified', async () => {
                 const release = await depositRelease()
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(releaseId: String, pId: String?) {
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -704,13 +704,13 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Fails to withdraw a pack from a release that does not exist', async () => {
                 await depositRelease()
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(releaseId: String, pId: String?) {
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -730,13 +730,13 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Fails to withdraw a pack with a UUID  that does not exist within a release', async () => {
                 const release = await depositRelease()
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(releaseId: String, pId: String?) {
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -756,13 +756,13 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Fails to withdraw a pack from a release that doesnt contain anymore packs', async () => {
                 const release = await depositRelease()
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(releaseId: String, pId: String?) {
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -790,29 +790,29 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
     describe('SellerCatalog interface methods', () => {
         const bulkDepositReleases = async () => {
             const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
                         execute {
-                            let inputData1 : [TheMoonNFTContract.MoonNftData] = [
-                                TheMoonNFTContract.MoonNftData(
+                            let inputData1 : [MoonNFT.MoonNftData] = [
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
                                     creatorId: 1,
                                     metadata: {}
                                 ),
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
@@ -820,15 +820,15 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                                     metadata: {}
                                 )
                             ]
-                            let inputData2 : [TheMoonNFTContract.MoonNftData] = [
-                                TheMoonNFTContract.MoonNftData(
+                            let inputData2 : [MoonNFT.MoonNftData] = [
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url2",
                                     creator: "testCreator2",
                                     creatorId: 2,
                                     metadata: {}
                                 ),
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url2",
                                     creator: "testCreator2",
@@ -836,15 +836,15 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                                     metadata: {}
                                 )
                             ]
-                            let inputData3 : [TheMoonNFTContract.MoonNftData] = [
-                                TheMoonNFTContract.MoonNftData(
+                            let inputData3 : [MoonNFT.MoonNftData] = [
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url3",
                                     creator: "testCreator3",
                                     creatorId: 3,
                                     metadata: {}
                                 ),
-                                TheMoonNFTContract.MoonNftData(
+                                MoonNFT.MoonNftData(
                                     0,
                                     "url3",
                                     creator: "testCreator3",
@@ -858,7 +858,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                             let nfts3 <- self.minterRef.bulkMintNfts(inputData3)
 
 
-                            let packData1 = TheMoonNFTContract.MoonNftPackData(
+                            let packData1 = MoonNFT.MoonNftPackData(
                                 0,
                                 [],
                                 "url",
@@ -866,7 +866,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                                 creator: "testCreator1",
                                 creatorId: 1
                             )
-                            let packData2 = TheMoonNFTContract.MoonNftPackData(
+                            let packData2 = MoonNFT.MoonNftPackData(
                                 0,
                                 [],
                                 "url",
@@ -874,7 +874,7 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                                 creator: "testCreator2",
                                 creatorId: 2
                             )
-                            let packData3 = TheMoonNFTContract.MoonNftPackData(
+                            let packData3 = MoonNFT.MoonNftPackData(
                                 0,
                                 [],
                                 "url",
@@ -912,35 +912,35 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
 
         const bulkDepositNfts = async () => {
             const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction() {
-                        let minterRef: &${TheMoonNFTContract}.NftMinter
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let minterRef: &${MoonNFT}.NftMinter
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.minterRef = authAccount.borrow<&${TheMoonNFTContract}.NftMinter>(from: ${TheMoonNFTContract}.MINTER_STORAGE_PATH) ??
+                            self.minterRef = authAccount.borrow<&${MoonNFT}.NftMinter>(from: ${MoonNFT}.MINTER_STORAGE_PATH) ??
                                 panic("Could not borrow nft minter")
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
                         execute {
-                            let inputData1 = ${TheMoonNFTContract}.MoonNftData(
+                            let inputData1 = ${MoonNFT}.MoonNftData(
                                     0,
                                     "url1",
                                     creator: "testCreator1",
                                     creatorId: 1,
                                     metadata: {}
                             )
-                            let inputData2 = ${TheMoonNFTContract}.MoonNftData(
+                            let inputData2 = ${MoonNFT}.MoonNftData(
                                     0,
                                     "url2",
                                     creator: "testCreator2",
                                     creatorId: 2,
                                     metadata: {}
                             )
-                            let inputData3 = ${TheMoonNFTContract}.MoonNftData(
+                            let inputData3 = ${MoonNFT}.MoonNftData(
                                     0,
                                     "url3",
                                     creator: "testCreator3",
@@ -973,12 +973,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Accurately returns the data for all releases within the SellerCatalog at any point in time', async () => {
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address) : [${TheMoonNFTContract}.MoonNftReleaseData] {
+                    pub fun main (contractAddress: Address) : [${MoonNFT}.MoonNftReleaseData] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getDataForAllReleases()
@@ -1006,12 +1006,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Accurately returns the count of all releases within the SellerCatalog at any point in time', async () => {
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     pub fun main (contractAddress: Address) : Int {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getTotalPackReleaseCount()
@@ -1040,12 +1040,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const releaseId = releaseData[0].id;
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     pub fun main (contractAddress: Address, releaseId: String) : Bool {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.packReleaseExists(id: releaseId)
@@ -1062,12 +1062,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Returns false for a releaseId associated with a release that does not exist within the SellerCatalog', async () => {
                 await bulkDepositReleases();
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     pub fun main (contractAddress: Address, releaseId: String) : Bool {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.packReleaseExists(id: releaseId)
@@ -1088,12 +1088,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const firstRelease = depositedReleasesData[0];
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, releaseId: String) : ${TheMoonNFTContract}.MoonNftReleaseData {
+                    pub fun main (contractAddress: Address, releaseId: String) : ${MoonNFT}.MoonNftReleaseData {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getPackReleaseData(id: releaseId)
@@ -1112,12 +1112,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 await bulkDepositReleases();
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, releaseId: String) : ${TheMoonNFTContract}.MoonNftReleaseData {
+                    pub fun main (contractAddress: Address, releaseId: String) : ${MoonNFT}.MoonNftReleaseData {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getPackReleaseData(id: releaseId)
@@ -1136,12 +1136,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const firstNft = depositedNfts[0];
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, nftId: UInt64) : ${TheMoonNFTContract}.MoonNftData {
+                    pub fun main (contractAddress: Address, nftId: UInt64) : ${MoonNFT}.MoonNftData {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getNftData(id: nftId)
@@ -1160,12 +1160,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 await bulkDepositNfts();
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, releaseId: String) : ${TheMoonNFTContract}.MoonNftReleaseData {
+                    pub fun main (contractAddress: Address, releaseId: String) : ${MoonNFT}.MoonNftReleaseData {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getPackReleaseData(id: releaseId)
@@ -1182,12 +1182,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
         describe('getDataForAllNfts() method', () => {
             it('Accurately returns the data for all MoonNfts within the SellerCatalog at any point in time', async () => {
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address) : [${TheMoonNFTContract}.MoonNftData] {
+                    pub fun main (contractAddress: Address) : [${MoonNFT}.MoonNftData] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getDataForAllNfts()
@@ -1215,12 +1215,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Accurately returns the count of all releases within the SellerCatalog at any point in time', async () => {
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     pub fun main (contractAddress: Address) : Int {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getTotalNFTCount()
@@ -1249,12 +1249,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const nftId = nftData[0].id;
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     pub fun main (contractAddress: Address, nftId: UInt64) : Bool {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.nftExists(id: nftId)
@@ -1271,12 +1271,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Returns false for an nftId associated with a MoonNft that does not exist within the SellerCatalog', async () => {
                 await bulkDepositNfts();
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     pub fun main (contractAddress: Address, nftId: UInt64) : Bool {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.nftExists(id: nftId)
@@ -1297,12 +1297,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const firstNft = nftData[0];
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, creatorId: Int32) : [${TheMoonNFTContract}.MoonNftData] {
+                    pub fun main (contractAddress: Address, creatorId: Int32) : [${MoonNFT}.MoonNftData] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getNftsByCreatorId(creatorId)
@@ -1320,12 +1320,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Throws when a creatorId passed as arguments has no MoonNft deposits associated with them', async () => {
                 await bulkDepositNfts();
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, creatorId: Int32) : [${TheMoonNFTContract}.MoonNftData] {
+                    pub fun main (contractAddress: Address, creatorId: Int32) : [${MoonNFT}.MoonNftData] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getNftsByCreatorId(creatorId)
@@ -1344,12 +1344,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const firstNft = nftData[0];
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, creator: String) : [${TheMoonNFTContract}.MoonNftData] {
+                    pub fun main (contractAddress: Address, creator: String) : [${MoonNFT}.MoonNftData] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getNftsByCreator(creator)
@@ -1367,12 +1367,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Throws when a creator passed as arguments has no MoonNft deposits associated with them', async () => {
                 await bulkDepositNfts();
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, creator: String) : [${TheMoonNFTContract}.MoonNftData] {
+                    pub fun main (contractAddress: Address, creator: String) : [${MoonNFT}.MoonNftData] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getNftsByCreator(creator)
@@ -1391,12 +1391,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const firstRelease = releaseData[0];
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, creatorId: Int32) : [${TheMoonNFTContract}.MoonNftReleaseData] {
+                    pub fun main (contractAddress: Address, creatorId: Int32) : [${MoonNFT}.MoonNftReleaseData] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getPackReleasesByCreatorId(creatorId)
@@ -1414,12 +1414,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Throws when a creatorId passed as arguments has no MoonNft deposits associated with them', async () => {
                 await bulkDepositNfts();
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, creatorId: Int32) : [${TheMoonNFTContract}.MoonNftReleaseData] {
+                    pub fun main (contractAddress: Address, creatorId: Int32) : [${MoonNFT}.MoonNftReleaseData] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getNftsByCreatorId(creatorId)
@@ -1438,12 +1438,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const firstRelease = releaseData[0];
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, creator: String) : [${TheMoonNFTContract}.MoonNftReleaseData] {
+                    pub fun main (contractAddress: Address, creator: String) : [${MoonNFT}.MoonNftReleaseData] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getPackReleasesByCreator(creator)
@@ -1461,12 +1461,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Throws when a creator passed as arguments has no MoonNft deposits associated with them', async () => {
                 await bulkDepositNfts();
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
-                    pub fun main (contractAddress: Address, creator: String) : [${TheMoonNFTContract}.MoonNftReleaseData] {
+                    pub fun main (contractAddress: Address, creator: String) : [${MoonNFT}.MoonNftReleaseData] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getNftsByCreatorId(creator)
@@ -1482,13 +1482,13 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
         describe('getCurrentPackIdsAvailableWithinRelease() method', () => {
             const withdrawPackFromRelease = async (releaseId, packUUID) => {
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     transaction(releaseId: String, pId: String?) {
-                        let platformSeller: &${TheMoonNFTContract}.SinglePlatformSeller
+                        let platformSeller: &${MoonNFT}.SinglePlatformSeller
 
                         prepare(authAccount: AuthAccount) {
-                            self.platformSeller = authAccount.borrow<&TheMoonNFTContract.SinglePlatformSeller>(from: ${TheMoonNFTContract}.SINGLE_PLATFORM_SELLER_PATH) ??
+                            self.platformSeller = authAccount.borrow<&MoonNFT.SinglePlatformSeller>(from: ${MoonNFT}.SINGLE_PLATFORM_SELLER_PATH) ??
                                 panic("Could not borrow the Single Platform Seller")
                         }
 
@@ -1506,12 +1506,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
             it('Throws if releaseId does not exist within seller Catalog', async () => {
                 await bulkDepositReleases();
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     pub fun main (contractAddress: Address, releaseId: String) : [String] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getCurrentPackIdsAvailableWithinRelease(id: releaseId)
@@ -1528,12 +1528,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const firstRelease = releases[0];
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     pub fun main (contractAddress: Address, releaseId: String) : [String] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getCurrentPackIdsAvailableWithinRelease(id: releaseId)
@@ -1562,12 +1562,12 @@ describe('SinglePlatformSeller resource and SellerCatalog interface', () => {
                 const firstRelease = releases[0];
 
                 const code = `
-                    import ${TheMoonNFTContract} from ${platformAccount}
+                    import ${MoonNFT} from ${platformAccount}
 
                     pub fun main (contractAddress: Address, releaseId: String) : [String] {
                         let moonPublicAccount = getAccount(contractAddress)
 
-                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${TheMoonNFTContract}.SellerCatalog}>(${TheMoonNFTContract}.SELLER_CATALOG_PATH)
+                        let sellerCatalogCapability = moonPublicAccount.getCapability<&{${MoonNFT}.SellerCatalog}>(${MoonNFT}.SELLER_CATALOG_PATH)
                         let sellerCatalog = sellerCatalogCapability.borrow() ?? panic("Could not borrow seller catalog")
 
                         return sellerCatalog.getCurrentPackIdsAvailableWithinRelease(id: releaseId)
