@@ -2,7 +2,7 @@ import NonFungibleToken from 0xNFTAddress
 
 pub contract MoonNFT: NonFungibleToken {
 
-     pub var totalSupply: UInt64
+    pub var totalSupply: UInt64
     // Path for the receiver capability
     pub let MOON_PUBLIC_COLLECTION_PUBLIC_PATH: PublicPath
     pub let PUBLIC_COLLECTION_PUBLIC_PATH: PublicPath
@@ -766,24 +766,34 @@ pub contract MoonNFT: NonFungibleToken {
     }
 
     pub resource NftMinter {
+        access(self) var nftIdCount: UInt64
         access(self) var packIdCount: UInt64
 
-        init() {
+        access(account) init() {
             self.packIdCount = 0
+            self.nftIdCount = 0
         }
 
-        access(self) fun incrementTotalSupply() {
-            MoonNFT.totalSupply = MoonNFT.totalSupply + 1 as UInt64
+        access(self) fun incrementNftId() {
+            self.nftIdCount = self.nftIdCount + 1 as UInt64
+            // Can't rely on totalSupply to mint NFTs and create unique Id's
+            // as this is a publicly accessable and modifiable variable
+            // so we have to account for shortcomings of NonFungibleToken standard
+            MoonNFT.totalSupply = self.nftIdCount
         }
 
         access(self) fun incrementPackIdCount() {
             self.packIdCount = self.packIdCount + 1 as UInt64
         }
 
-        pub fun mintNFT (_ nftData: MoonNftData ): @NFT {
-            self.incrementTotalSupply()
+        pub fun getTrueTotalSupply () : UInt64 {
+            return self.nftIdCount
+        }
+
+        pub fun mintNFT (_ nftData: MoonNftData ): @MoonNFT.NFT {
+            self.incrementNftId()
             let newNFT <- create NFT(
-                MoonNFT.totalSupply,
+                self.nftIdCount,
                 nftData.mediaUrl,
                 creator: nftData.originalContentCreator,
                 creatorId: nftData.creatorId,
@@ -794,7 +804,7 @@ pub contract MoonNFT: NonFungibleToken {
             return <-newNFT
         }
 
-        pub fun bulkMintNfts (_ nftsToMint: [MoonNftData]): @[NFT] {
+        pub fun bulkMintNfts (_ nftsToMint: [MoonNftData]): @[MoonNFT.NFT] {
             pre {
                 nftsToMint.length > 0 : "[NftMinter] No NFT's that we can mint"
             }
@@ -811,7 +821,7 @@ pub contract MoonNFT: NonFungibleToken {
             return <- mintedNfts
         }
 
-        pub fun createNftPack (_ packOfNfts: @[NFT], _ data: MoonNftPackData) : @MoonNftPack {
+        pub fun createNftPack (_ packOfNfts: @[MoonNFT.NFT], _ data: MoonNftPackData) : @MoonNftPack {
             pre {
                 packOfNfts.length != 0 : "Cannot create a pack without nft's in it"
             }
@@ -830,7 +840,7 @@ pub contract MoonNFT: NonFungibleToken {
             return <- nftPack
         }
 
-        pub fun createNftPackRelease (id: String, _ packOfNfts: @{ String : [NFT]}, _ data: MoonNftPackData, price: Int) :@MoonNftRelease {
+        pub fun createNftPackRelease (id: String, _ packOfNfts: @{ String : [MoonNFT.NFT]}, _ data: MoonNftPackData, price: Int) :@MoonNftRelease {
             pre {
                 id != "" : "Pack Release Id cannot be empty"
                 packOfNfts.keys.length != 0 : "pack of nfts must contain at lease one nft grouping"
