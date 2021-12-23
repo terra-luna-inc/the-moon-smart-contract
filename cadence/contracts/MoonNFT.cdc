@@ -640,9 +640,20 @@ pub contract MoonNFT: NonFungibleToken {
             destroy old
         }
 
+        pub fun borrowRelease(releaseId: String): &MoonNftRelease {
+            pre {
+                self.packReleaseExists(id: releaseId) : "Release does not exist"
+            }
+
+            let packReleasesForSale: &{String : MoonNftRelease} = &self.packReleasesForSale as &{String : MoonNftRelease}
+            let release : &MoonNftRelease = &packReleasesForSale[releaseId] as &MoonNftRelease
+
+            return release
+        }
+
         pub fun getPackReleaseData(id: String): MoonNftReleaseData {
             pre {
-                self.packReleaseExists(id: id) : "Pack does not exist"
+                self.packReleaseExists(id: id) : "Release does not exist"
             }
 
             let packsForSale: &{String : MoonNftRelease} = &self.packReleasesForSale as &{String : MoonNftRelease}
