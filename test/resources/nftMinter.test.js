@@ -11,7 +11,7 @@ import {
 } from "flow-js-testing";
 import { getTransactionEventName, initializePlatformAccount, deployNftContract } from '../testHelpers';
 
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 
 const platformAccountName = "PlatformAccount";
 const MoonNFT = "MoonNFT";
