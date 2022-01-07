@@ -77,7 +77,7 @@ pub contract MoonNFT: NonFungibleToken {
     pub resource MoonNftPack {
         pub let id: UInt64
         pub let previewMediaUrl: String
-        pub let pack : @{UInt64 : NFT}
+        access(contract) let pack : @{UInt64 : NFT}
         pub let title: String
         // made this optional in case we decide to mix nfts from different creators
         // into one pack
@@ -228,7 +228,7 @@ pub contract MoonNFT: NonFungibleToken {
             return <- pack
         }
 
-        pub fun appendMorePacks(packUUID: String, pack: @MoonNftPack) {
+        pub fun appendPackToRelease(packUUID: String, pack: @MoonNftPack) {
             pre {
                 self.packGroupings.containsKey(packUUID) : "Already have a pack within grouping with that UUID. Use a different UUID"
             }
@@ -299,7 +299,7 @@ pub contract MoonNFT: NonFungibleToken {
 
     pub resource Collection: MoonCollectionPublic,NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
-        pub let ownedPacks: @{UInt64: MoonNftPack}
+        access(contract) let ownedPacks: @{UInt64: MoonNftPack}
 
         init () {
             self.ownedNFTs <- {}
